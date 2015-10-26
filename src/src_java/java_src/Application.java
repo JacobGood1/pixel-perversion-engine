@@ -5,7 +5,7 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;import java.lang.Override;
 
 
-public class Game implements ApplicationListener {
+public class Application implements ApplicationListener {
     private AFn create_fn;
     private AFn dispose_fn;
     private AFn render_fn;
@@ -13,7 +13,7 @@ public class Game implements ApplicationListener {
     private AFn pause_fn;
     private AFn resume_fn;
 
-    public Game(
+    public Application(
             LwjglApplicationConfiguration cfg,
             AFn create_fn,
             AFn dispose_fn,

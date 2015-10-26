@@ -11,7 +11,7 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 
 
 public class Start {
-    private static Game game;
+    private static Application game;
 
     public static void start(
             LwjglApplicationConfiguration config,
@@ -21,7 +21,7 @@ public class Start {
             AFn resize_fn,
             AFn pause_fn,
             AFn resume_fn){
-        game = new Game(config,
+        game = new Application(config,
                 create_fn,
                 dispose_fn,
                 render_fn,

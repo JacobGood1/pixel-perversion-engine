@@ -10,7 +10,7 @@
 
 (defonce cfg
          (pixel-perversion-engine.config/new-config
-           :title "conan"
+           :title "Age of Conan Ripoff"
            :height 640
            :width 480
            :use-gl-30 false))
