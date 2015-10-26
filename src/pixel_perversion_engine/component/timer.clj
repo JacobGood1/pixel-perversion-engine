@@ -13,5 +13,7 @@
      :timer-in-progress? true
      :timer-finished? false}))
 
-(make-processor update-timer [:timer] (update-in entity [:time] (fn [time]
-                                                                  (inc time))))
+(make-processor update-timer [:timer]
+                (update-in e [:time]
+                           (fn [time]
+                             (inc time))))

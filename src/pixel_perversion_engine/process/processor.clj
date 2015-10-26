@@ -1,16 +1,9 @@
-(ns pixel-perversion-engine.process.processor)
-
-(defn contains-keys?
-  "Checks if this entity contains specified keys."
-  [entity & keys]
-  (loop [[key & rest-keys :as keys] keys]
-    (cond (empty? keys) true
-          (contains? entity key) (recur rest-keys)
-          :default false)))
+(ns pixel-perversion-engine.process.processor
+  (:use pixel-perversion-engine.utilities))
 
 (defmacro make-processor
-  [name required-keys code]
-  (let [entity 'entity
+  [name required-keys & code]
+  (let [entity 'e
         ;code 'code
         ;name 'name
         ]
@@ -23,7 +16,7 @@
                                            (apply str)
                                            symbol))
                               required-keys)]} ~entity]
-           ~code)
+           ~@code)
          ~entity))))
 
 (comment (defmacro make-processor
