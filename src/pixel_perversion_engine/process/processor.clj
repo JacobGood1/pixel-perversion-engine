@@ -14,10 +14,17 @@
         ;code 'code
         ;name 'name
         ]
-    `(defn ~name [~entity] (if (contains-keys? ~entity ~@required-keys)
-                             (let [{:keys [~@(map (fn [s] (symbol (apply str (rest (str s))))) required-keys)]} ~entity]
-                               ~code)
-                             ~entity))))
+    `(defn ~name
+       [~entity]
+       (if (contains-keys? ~entity ~@required-keys)
+         (let [{:keys [~@(map (fn [s] (->> (-> s
+                                               str
+                                               rest)
+                                           (apply str)
+                                           symbol))
+                              required-keys)]} ~entity]
+           ~code)
+         ~entity))))
 
 (comment (defmacro make-processor
   [name required-keys code]
