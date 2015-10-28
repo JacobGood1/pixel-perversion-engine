@@ -1,4 +1,4 @@
-(ns pixel-perversion-engine.component.spine)
+(ns pixel-perversion-engine.component.spine.spine)
 
 (defn spine
   []

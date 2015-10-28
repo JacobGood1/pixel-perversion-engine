@@ -1,4 +1,4 @@
-(ns pixel-perversion-engine.component)
+(ns pixel-perversion-engine.component.component)
 
 (def component
   {:type [:component]})
@@ -18,7 +18,3 @@
         this-children (:children this)
         conj-children (apply conj this-children children)]
     (update-in this [:children] (fn [this] conj-children))))
-
-(defn update
-  [this]
-  )

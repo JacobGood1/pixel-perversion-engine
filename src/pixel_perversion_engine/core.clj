@@ -3,7 +3,11 @@
            [com.badlogic.gdx.graphics.g2d SpriteBatch BitmapFont]
            [com.badlogic.gdx.graphics GL20 Color]
            [com.badlogic.gdx Gdx])
-  (:require [pixel-perversion-engine.config]))
+  (:require [pixel-perversion-engine.config])
+  (:use pixel-perversion-engine.scene.scene
+        test-game.scene.game))
+
+(def game1 (atom game))
 
 (defonce sprite-batch nil)
 (defonce font nil)
@@ -30,7 +34,11 @@
   (.glClear Gdx/gl GL20/GL_COLOR_BUFFER_BIT)
   (.begin sprite-batch)
   (.draw font sprite-batch "Hello world" (float 200) (float 200))
-  (.end sprite-batch))
+  (.end sprite-batch)
+
+  (update! game1)
+  ;(println (:entities @game1))
+  )
 
 (defn resize [width height])
 (defn pause [])

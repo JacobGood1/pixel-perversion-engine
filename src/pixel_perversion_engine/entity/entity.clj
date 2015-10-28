@@ -1,13 +1,13 @@
 (ns pixel-perversion-engine.entity.entity
   (:use [pixel-perversion-engine.utilities]
-        [pixel-perversion-engine.vision.game
-         :only [dec-counter inc-counter]]))
+        [pixel-perversion-engine.scene.scene
+         :only [inc-counter]]))
 
-(defn make-entity
-  "assumes vision contains :entities"
+(defn attach-entity
+  "assumes scene contains :entities"
   [scene entity]
   (let [pos (keyword (str (:counter scene)))
-        entity (assoc entity :pos pos)]
+        entity (assoc entity :scene-index-position pos)]
     (-> scene
         inc-counter
         (update-in [:entities]
@@ -16,7 +16,7 @@
 
 (defn remove-entity
   "args [scene entity]"
-  [{entities :entities :as scene} {pos :pos}]
+  [{entities :entities :as scene} {pos :scene-index-position}]
   (assoc scene :entities (dissoc entities pos)))
 
 (defn remove-components

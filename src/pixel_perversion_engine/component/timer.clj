@@ -1,6 +1,8 @@
 (ns pixel-perversion-engine.component.timer
-  (:use [pixel-perversion-engine.component]
-        [pixel-perversion-engine.process.processor]))
+  (:use [pixel-perversion-engine.component.component]
+        [pixel-perversion-engine.processor.processor]))
+
+;BOOKMARK Maybe components should implement callbacks?
 
 (defn create-timer
   [maximum-time loop?]
@@ -12,8 +14,10 @@
      :loop? loop?
      :timer-in-progress? true
      :timer-finished? false}))
-;
+
+(def update-timer)
+(def e)
 (make-processor update-timer [:timer]
-                (update-in e [:time]
+                (update-in e [:timer :time]
                            (fn [time]
                              (inc time))))
