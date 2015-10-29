@@ -6,13 +6,14 @@
 
   ;Easy symbol generation for use within the macro.
   (let [entity 'e
+        scene 's
         ;code 'code
         ;name 'name
         ]
 
     ;BOOKMARK This fn will be stored within a vector and applied to entities.
     `(defn ~name
-       [~entity]
+       [~scene ~entity]
 
        ;key-lock paradigm.
        ;Check to see if this entity meets the requirements (has the necessary components) for this action.
@@ -20,7 +21,7 @@
 
          ;Convert all keys to symbols, then destructure the map with those symbols.
          ;This will give us access to all the components of the entity within the code block.
-         (let [{:keys [~@(map (fn [s] (->> (-> s
+         (let [{:keys [~@(map (fn [sym] (->> (-> sym
                                                str
                                                rest)
                                            (apply str)
