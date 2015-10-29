@@ -8,7 +8,8 @@
 (def game (-> scene
               (attach-processors [update-timer
                                   ])
-              (attach-entity player)
-              (attach-entity player)))
+              (attach-entity (assoc player :x 3))
+              (attach-entity (assoc player :x 10))))
+
 
 

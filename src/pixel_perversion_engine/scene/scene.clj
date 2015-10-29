@@ -16,10 +16,20 @@
      (conj (:messages scene) [recievers message]))))
 
 
-;TODO apply-message needs to work with :all
-;TODO messages need to work like a stack! pop off the end
-(defn apply-message
-  [{[[recievers message] _] :messages entities :entities :as scene}]
+
+(defn- all-message-handler
+  [message {:keys [entities messages] :as scene}]
+  (assoc (assoc scene
+             :entities
+             (into {}
+                   (map (fn [[pos e]]
+                          [pos (message e)])
+                        entities)))
+      :messages
+      (pop messages)))
+
+(defn- select-message-handler
+  [recievers message {entities :entities :as scene}]
   (loop [[key & keys :as recievers] recievers
          scene scene]
     (if (seq recievers)
@@ -29,7 +39,27 @@
                  :entities
                  (assoc entities key (message (key entities)))))
         (recur keys scene))
-      (assoc scene :messages []))))
+      (assoc scene :messages (pop (:messages scene))))))
+
+
+(defn- apply-current-message
+  [message-type message scene]
+  (if (= (first message-type) :all)
+      (all-message-handler message scene)
+      (select-message-handler message-type message scene)))
+
+(defn apply-messages
+  "will apply all messages in the :messages que and then empties it out"
+  [{:keys [messages] :as scene}]
+  (if (> (count messages))
+    (loop [[[message-type message] & messages] messages
+           scene scene]
+      (if message-type
+        (recur messages
+               (apply-current-message message-type message scene))
+        scene))
+    scene))
+
 
 
 (defn apply-processors-to-entities
@@ -60,4 +90,6 @@
 
 (defn update!
   [scene]
-  (swap! scene apply-processors-to-entities))
+  (swap! scene (fn [s] (-> s
+                           apply-processors-to-entities
+                           apply-messages))))
