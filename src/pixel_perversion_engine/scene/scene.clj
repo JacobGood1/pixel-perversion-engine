@@ -3,7 +3,8 @@
 (def scene {:counter 0
             :entities {}
             :processors []
-            :messages []})
+            :messages []
+            :scenes []})
 
 (defn send-message
   ([scene message]
@@ -93,3 +94,13 @@
   (swap! scene (fn [s] (-> s
                            apply-processors-to-entities
                            apply-messages))))
+
+(defn kek
+  [scene]
+  (if (seq (:scene scene))
+    (assoc
+      (update-in scene
+                 [:v]
+                 (fn [v] (* 10 v)))
+      :scene (vec (for [s (:scene scene)] (kek s))))
+    (update-in scene [:v] (fn [v] (* 10 v)))))
