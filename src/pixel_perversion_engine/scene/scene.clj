@@ -1,6 +1,66 @@
 (ns pixel-perversion-engine.scene.scene)
 
-(def scene {:counter 0 :scenes [] :entities {} :processors []})
+(def scene {:counter 0
+            :entities {}
+            :processors []
+            :messages []})
+
+(defn send-message
+  ([scene message]
+   (assoc scene
+     :messages
+     (conj (:messages scene) [[:all] message])))
+  ([scene recievers message]
+   (assoc scene
+     :messages
+     (conj (:messages scene) [recievers message]))))
+
+
+
+(defn- all-message-handler
+  [message {:keys [entities messages] :as scene}]
+  (assoc (assoc scene
+             :entities
+             (into {}
+                   (map (fn [[pos e]]
+                          [pos (message e)])
+                        entities)))
+      :messages
+      (pop messages)))
+
+(defn- select-message-handler
+  [recievers message {entities :entities :as scene}]
+  (loop [[key & keys :as recievers] recievers
+         scene scene]
+    (if (seq recievers)
+      (if (key entities)
+        (recur keys
+               (assoc scene
+                 :entities
+                 (assoc entities key (message (key entities)))))
+        (recur keys scene))
+      (assoc scene :messages (pop (:messages scene))))))
+
+
+(defn- apply-current-message
+  [message-type message scene]
+  (if (= (first message-type) :all)
+      (all-message-handler message scene)
+      (select-message-handler message-type message scene)))
+
+(defn apply-messages
+  "will apply all messages in the :messages que and then empties it out"
+  [{:keys [messages] :as scene}]
+  (if (> (count messages))
+    (loop [[[message-type message] & messages] messages
+           scene scene]
+      (if message-type
+        (recur messages
+               (apply-current-message message-type message scene))
+        scene))
+    scene))
+
+
 
 (defn apply-processors-to-entities
   [{:keys [processors entities] :as scene}]
@@ -19,7 +79,7 @@
                           ;note:
                           ;map will convert this map to a seq. we then destructure the seq and apply proc to the entity.
                           ;and return the data back as it came in.
-                          (map (fn [[c e]] [c (proc e)])
+                          (map (fn [[c e]] [c (proc scene e)])
                                e))
                    e)))))
 
@@ -30,20 +90,6 @@
 
 (defn update!
   [scene]
-  (loop []
-    (cond (if)))
-  (swap! scene apply-processors-to-entities))
-
-(comment (defn update!
-  [scene]
-  (swap! scene apply-processors-to-entities)))
-
-(defn kek
-  [scene]
-  (if (seq (:scene scene))
-    (assoc
-      (update-in scene
-                 [:v]
-                 (fn [v] (* 10 v)))
-      :scene (vec (for [s (:scene scene)] (kek s))))
-    (update-in scene [:v] (fn [v] (* 10 v)))))
+  (swap! scene (fn [s] (-> s
+                           apply-processors-to-entities
+                           apply-messages))))
