@@ -1,5 +1,6 @@
 package com.pixel_perversion_engine.box2d;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.esotericsoftware.spine.Bone;
 import com.esotericsoftware.spine.SkeletonBounds;
@@ -22,6 +23,17 @@ public class SpineBox2dController{
     private World world;
 
     public SpineBox2dController(Spine spine, String bbAName, String boneName, short groupIndex, Enum objectType) {
+        this.spine = spine;
+        this.bbAName = bbAName;
+        this.boneName = boneName;
+        this.groupIndex = groupIndex;
+
+        //build colliders and attach to box2dWorld
+        setupBox2d();
+    }
+
+    public SpineBox2dController(World world, Spine spine, String bbAName, String boneName) {
+        this.world = world;
         this.spine = spine;
         this.bbAName = bbAName;
         this.boneName = boneName;
@@ -112,7 +124,6 @@ public class SpineBox2dController{
     public void setControlled(Bone controlled) {this.controlled = controlled;}
 
     public String getBbAName(){return bbAName;}
-
 
     public void safeDelete(){
         if (controller != null) {

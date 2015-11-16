@@ -48,7 +48,7 @@ public class Render {
     private Map<String, Color> color;
     private Color mutibleColor = new Color();
 
-    private HashMap<Enum, Drawable> drawables = new HashMap<Enum, Drawable>();
+    public HashMap<Enum, Drawable> drawables = new HashMap<Enum, Drawable>();
     public SpineDrawable spineDrawable;
 
     public Render(){
@@ -226,7 +226,7 @@ public class Render {
                 height);
     }
 
-    public void debug_Spine (Render render, HashMap<Enum, Drawable> drawable) {
+    public void debug_Spine (Render render, Viewport viewport, HashMap<Enum, Drawable> drawable) {
         float sclF = 1f;
         render.getShapeRenderer().setProjectionMatrix(render.getSpriteBatch().getProjectionMatrix().scl(sclF));
         render.getShapeRenderer().setTransformMatrix(render.getSpriteBatch().getTransformMatrix().scl(sclF));
@@ -239,7 +239,13 @@ public class Render {
         //this.camera.getCamera(Camera.CameraType.world).combined
         renderer.getProjectionMatrix().set(spriteBatch.getProjectionMatrix());
         renderer.getTransformMatrix().set(spriteBatch.getTransformMatrix());
-        //shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+
+        com.badlogic.gdx.graphics.Camera camera = viewport.getCamera();
+        camera.update();
+        renderer.setProjectionMatrix(camera.combined);
+        //render.getPolygonBatch().begin();
+
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
 
         //spine objects
         for (int i = 0; i < drawables_size; i++) {
@@ -250,7 +256,8 @@ public class Render {
                 }
             }
         }
-        //shapeRenderer.end();
+
+        shapeRenderer.end();
     }
 
     public void draw(Render render, Viewport viewport){

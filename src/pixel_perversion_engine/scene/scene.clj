@@ -1,10 +1,8 @@
 (ns pixel-perversion-engine.scene.scene)
 
 (def scene {:counter 0
-            :entities {}
             :processors []
-            :messages []
-            :scenes []})
+            :messages []})
 
 (defn send-message
   ([scene message]
@@ -95,12 +93,20 @@
                            apply-processors-to-entities
                            apply-messages))))
 
-(defn kek
+(defn update-scenex
   [scene]
+  (-> scene
+      apply-processors-to-entities
+      apply-messages))
+
+(defn kek
+  [scene u-s]
   (if (seq (:scene scene))
     (assoc
-      (update-in scene
-                 [:v]
-                 (fn [v] (* 10 v)))
-      :scene (vec (for [s (:scene scene)] (kek s))))
-    (update-in scene [:v] (fn [v] (* 10 v)))))
+      ;(update-in scene [:v] (fn [v] (* 10 v)))
+      (u-s scene)
+      :scene (vec (for [s (:scene scene)] (kek s u-s))))
+    ;(update-in scene [:v] (fn [v] (* 10 v)))
+    (u-s scene)
+    ))
+

@@ -6,24 +6,22 @@
            [com.pixel_perversion_engine.asset_manager Assets]
            [com.badlogic.gdx.utils.viewport FitViewport]
            [com.pixel_perversion_engine.render Render]
-           [com.pixel_perversion_engine.spine Spine])
+           [com.pixel_perversion_engine.spine Spine]
+           [com.badlogic.gdx.physics.box2d World]
+           [com.pixel_perversion_engine.box2d SpineBox2dController]
+           [com.badlogic.gdx.math Vector2]
+           [com.badlogic.gdx.graphics.glutils ShaderProgram])
   (:require [pixel-perversion-engine.config])
-  (:use pixel-perversion-engine.scene.scene
-        test-game.scene.game
-        test-game.scene.root))
+  (:use
+    ;pixel-perversion-engine.scene.scene
+    pixel-perversion-engine.render.render
+    pixel-perversion-engine.object.object
+    snake-game.object.main-menu
+    snake-game.object.game
+    snake-game.object.player
+    ))
 
-(def root1 (atom root))
-(def game1 (atom game))
-
-(conj (:scenes root1) game1)
-
-(defonce sprite-batch nil)
-(defonce font nil)
-(defonce a-m nil)
-(defonce camera nil)
-(defonce viewport nil)
-(defonce renderz nil)
-(defonce spider nil)
+(defonce root-atomic nil)
 
 (defonce cfg
          (pixel-perversion-engine.config/new-config
@@ -32,45 +30,65 @@
            :height 480
            :use-gl-30 false))
 
+(def proc_path [
+                ;[:main-menu]
+
+                ;game elements
+                [:game :player]
+                 ;update game last (box2d step)
+                [:game]
+                ])
+
+(def vertexShader-BW nil)
+(def fragmentShader-BW nil)
+(def shaderProgram nil)
+
 (defn create []
-  (def sprite-batch (new SpriteBatch))
-  (def font (new BitmapFont))
-  (.setColor font Color/RED)
+  (let [root (root 800 480)
+        game-attached (game root) ;(attach-object root [:game] (game root))
+        main-menu-attached (main-menu game-attached) ;(attach-object game-attached [:main-menu] (main-menu root))
+        root-final main-menu-attached
+        ]
+    (def root-atomic (atom root-final)))
 
-  (def a-m (new Assets))
-
-  (def camera (new OrthographicCamera (float 800) (float 480)))
-  (def viewport (new FitViewport (float 800) (float 480) camera))
-  (def renderz (new Render))
-  (def spider (new Spine a-m "play/linear", "play/json/spider", (float 0), (float 0), (float 1)))
-  (.add (.-spineDrawable renderz)
-        spider ;0.005
-        0)
-
-  (.setAnimation spider 0 "run" true)
+  (def vertexShader-BW (.readString (.internal (Gdx/files) "src/pixel_perversion_engine/shader/greyscale/vertex.glsl")))
+  (def fragmentShader-BW (.readString (.internal (Gdx/files) "src/pixel_perversion_engine/shader/greyscale/fragment.glsl")))
+  (def shaderProgram (new ShaderProgram vertexShader-BW fragmentShader-BW))
+  (set! (.-shaderProgram (.-spineDrawable (get-in @root-atomic [:render]))) shaderProgram)
+  (set! (.-useShader (.-spineDrawable (get-in @root-atomic [:render]))) true)
   )
 
 
 (defn dispose []
-  (.dispose sprite-batch)
-  (.dispose font))
+  (let [dispose-seq (for [obj (get-in @root-atomic [:dispose-list])] obj)]
+    (map (fn [obj] (.dispose obj)) dispose-seq))
+
+  ;(println "ALL OBJECTS DISPOSED!")
+  )
 
 (defn render []
   (.glClearColor Gdx/gl 0 0 0 1)
   (.glClear Gdx/gl GL20/GL_COLOR_BUFFER_BIT)
-  (.begin sprite-batch)
-  (.draw font sprite-batch "Hello world" (float 200) (float 200))
-  (.end sprite-batch)
 
-  (update! root1)
-  ;(println (:entities @game1))
+  ;update all app logic
+  (update! root-atomic proc_path)
 
-  (.update spider)
-  (.update viewport (float 800) (float 480))
-  (.draw (.-spineDrawable renderz) renderz viewport)
+  ;update viewport
+  (.update (get-in @root-atomic [:fit-viewport]) (float 800) (float 480))
+
+  ;render result
+  (.begin (get-in @root-atomic [:sprite-batch]))
+  (render-text @root-atomic "Hello world." 200 200)
+  (.end (get-in @root-atomic [:sprite-batch]))
+
+  (.draw (.-spineDrawable (get-in @root-atomic [:render]))
+         (get-in @root-atomic [:render])
+         (get-in @root-atomic [:fit-viewport]))
   )
 
-(defn resize [width height])
+(defn resize [width height]
+  ;update viewport
+  (.update (get-in @root-atomic [:fit-viewport]) (float width) (float height)))
 (defn pause [])
 (defn resume [])
 

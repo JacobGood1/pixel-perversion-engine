@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.esotericsoftware.spine.*;
+import com.pixel_perversion_engine.render.Render;
 
 /**
  * Created by Travis on 6/2/2015.
@@ -27,7 +28,8 @@ public class Spine {
     private boolean maskAA = false;
     private float maskX = 0f, maskY = 0f, maskHeight = 0f, maskWidth = 0f;
 
-    public Spine(AssetManager assetManager,
+    public Spine(Render render,
+                 AssetManager assetManager,
                  String textureAtlasPath,
                  String jsonPath,
                  float x, float y, float scale) {
@@ -55,6 +57,8 @@ public class Spine {
 
         //System.out.println("after update: " + skeleton.getRootBone().getScaleX());
 
+        //add to render object //TODO z-index is hardcoded to 0 for testing...
+        render.spineDrawable.add(this, 0);
     }
 
     public Spine(AssetManager assetManager,
@@ -86,8 +90,8 @@ public class Spine {
     }
 
     //secondary constructor for cloning
-    public Spine(AssetManager assetManager, Spine spine, float x, float y){
-        this(assetManager, spine.getTextureAtlasPath(), spine.getJsonPath(), x, y, spine.getScale());
+    public Spine(Render render, AssetManager assetManager, Spine spine, float x, float y){
+        this(render, assetManager, spine.getTextureAtlasPath(), spine.getJsonPath(), x, y, spine.getScale());
     }
 
     public void update() {
@@ -147,7 +151,11 @@ public class Spine {
 
     //TODO getX getY assum the first bone is the root bone
     public float getX(){return skeleton.getRootBone().getX();} //skeletonData.getBones().get(0).getX();
+    //TODO wtf get Y returns X?!?!
     public float getY(){return skeleton.getRootBone().getX();} //skeletonData.getBones().get(0).getY();
+
+    public void setX(float x){skeleton.getRootBone().setX(x);} //skeletonData.getBones().get(0).getX();
+    public void setY(float y){skeleton.getRootBone().setY(y);} //skeletonData.getBones().get(0).getY();
 
     public float getScale() {return scale;}
     public void setScale(float scale) {this.scale = scale;}
