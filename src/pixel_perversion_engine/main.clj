@@ -10,7 +10,8 @@
            [com.badlogic.gdx.physics.box2d World]
            [com.pixel_perversion_engine.box2d SpineBox2dController]
            [com.badlogic.gdx.math Vector2]
-           [com.badlogic.gdx.graphics.glutils ShaderProgram])
+           [com.badlogic.gdx.graphics.glutils ShaderProgram]
+           [com.pixel_perversion_engine.shader TestShader_NMap])
   (:require [pixel-perversion-engine.config])
   (:use
     ;pixel-perversion-engine.scene.scene
@@ -42,6 +43,7 @@
 (def vertexShader-BW nil)
 (def fragmentShader-BW nil)
 (def shaderProgram nil)
+(def testShader_NMap nil)
 
 (defn create []
   (let [root (root 800 480)
@@ -56,19 +58,14 @@
   (def shaderProgram (new ShaderProgram vertexShader-BW fragmentShader-BW))
   (set! (.-shaderProgram (.-spineDrawable (get-in @root-atomic [:render]))) shaderProgram)
   (set! (.-useShader (.-spineDrawable (get-in @root-atomic [:render]))) true)
-  )
 
-
-(defn dispose []
-  (let [dispose-seq (for [obj (get-in @root-atomic [:dispose-list])] obj)]
-    (map (fn [obj] (.dispose obj)) dispose-seq))
-
-  ;(println "ALL OBJECTS DISPOSED!")
-  )
+  (def testShader_NMap (new TestShader_NMap)))
 
 (defn render []
   (.glClearColor Gdx/gl 0 0 0 1)
   (.glClear Gdx/gl GL20/GL_COLOR_BUFFER_BIT)
+
+  (.render testShader_NMap)
 
   ;update all app logic
   (update! root-atomic proc_path)
@@ -91,6 +88,14 @@
   (.update (get-in @root-atomic [:fit-viewport]) (float width) (float height)))
 (defn pause [])
 (defn resume [])
+
+(defn dispose []
+  (let [dispose-seq (for [obj (get-in @root-atomic [:dispose-list])] obj)]
+    (map (fn [obj] (.dispose obj)) dispose-seq))
+
+  ;(println "ALL OBJECTS DISPOSED!")
+  (.dispose testShader_NMap)
+  )
 
 (Start/start
   cfg

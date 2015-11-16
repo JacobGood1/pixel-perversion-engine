@@ -24,6 +24,7 @@ public class SpineDrawable implements Drawable{
 
     public boolean useShader = false;
     public ShaderProgram shaderProgram;
+    FrameBuffer fbo = new FrameBuffer(Pixmap.Format.RGBA8888, 800, 480, false);
 
     private HashMap<Integer, Array<Spine>> spineDrawOrder;
     public SpineDrawable(int drawableSize){
@@ -42,10 +43,10 @@ public class SpineDrawable implements Drawable{
         //viewport.apply();
 
         //TESTING GREYSCALE SHADER!
-        FrameBuffer fbo = new FrameBuffer(Pixmap.Format.RGBA8888, 800, 480, false);
-        //Gdx.gl.glClearColor(0f, 0f, 0f, 0f);
-        //Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
         fbo.begin();
+        Gdx.gl.glClearColor(0f, 0f, 0f, 0f);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         com.badlogic.gdx.graphics.Camera camera = viewport.getCamera();
         camera.update();
