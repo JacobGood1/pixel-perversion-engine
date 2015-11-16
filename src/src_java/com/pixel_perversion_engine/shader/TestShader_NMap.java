@@ -12,7 +12,7 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 import org.lwjgl.input.Mouse;
 
 public class TestShader_NMap{
-    Texture rock, rockNormals;
+    Texture cmap, nmap;
 
     SpriteBatch batch;
     OrthographicCamera cam;
@@ -21,8 +21,8 @@ public class TestShader_NMap{
 
     //our constants...
     public static final float DEFAULT_LIGHT_Z = 0.075f;
-    public static final float AMBIENT_INTENSITY = 0.2f;
-    public static final float LIGHT_INTENSITY = 1f;
+    public static final float AMBIENT_INTENSITY = 0.1f;
+    public static final float LIGHT_INTENSITY = 2f;
 
     public static final Vector3 LIGHT_POS = new Vector3(0f,0f,DEFAULT_LIGHT_Z);
 
@@ -45,13 +45,9 @@ public class TestShader_NMap{
             //GL ES specific stuff
             Gdx.files.internal("src/pixel_perversion_engine/shader/nmap/fragment.glsl").readString();
 
-    public TestShader_NMap(){
-        create();
-    }
-
-    public void create() {
-        rock = new Texture(Gdx.files.internal("resources/cmap/cmap_brickwall.png"));//Texture.LINEAR
-        rockNormals = new Texture(Gdx.files.internal("resources/nmap/nmap_brickwall.png"));
+    public TestShader_NMap(Texture colorMap, Texture normalMap){
+        this.cmap = colorMap;
+        this.nmap = normalMap;
 
         ShaderProgram.pedantic = false;
         shader = new ShaderProgram(VERT, FRAG);
@@ -100,7 +96,6 @@ public class TestShader_NMap{
         });
     }
 
-
     public void resize(int width, int height) {
         cam.setToOrtho(false, width, height);
         batch.setProjectionMatrix(cam.combined);
@@ -122,7 +117,7 @@ public class TestShader_NMap{
         }
 
         batch.begin();
-        //batch.draw(rock, 0, 0);
+        //batch.draw(cmap, 0, 0);
 
         //shader will now be in use...
 
@@ -137,14 +132,14 @@ public class TestShader_NMap{
         shader.setUniformf("LightPos", LIGHT_POS);
 
         //bind normal map to texture unit 1
-        rockNormals.bind(1);
+        nmap.bind(1);
 
         //bind diffuse color to texture unit 0
         //important that we specify 0 otherwise we'll still be bound to glActiveTexture(GL_TEXTURE1)
-        rock.bind(0);
+        cmap.bind(0);
 
         //draw the texture unit 0 with our shader effect applied
-        batch.draw(rock, 0, 0);
+        batch.draw(cmap, 0, 0);
 
         batch.end();
     }
@@ -162,8 +157,14 @@ public class TestShader_NMap{
 
     public void dispose() {
         batch.dispose();
-        rock.dispose();
-        rockNormals.dispose();
+        cmap.dispose();
+        nmap.dispose();
         shader.dispose();
+    }
+
+    //object which describes a point light which will typically be stored within an array
+    //for the normalMap shader
+    public class PointLight{
+
     }
 }

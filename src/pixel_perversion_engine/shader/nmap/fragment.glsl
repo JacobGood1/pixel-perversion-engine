@@ -1,5 +1,3 @@
-
-
 //attributes from vertex shader
 varying vec4 vColor;
 varying vec2 vTexCoord;
@@ -21,7 +19,9 @@ void main() {
 
     //RGB of our normal map
     vec3 NormalMap = texture2D(u_normals, vTexCoord).rgb;
-    NormalMap.b = 1 - NormalMap.b;
+
+    //this flips an axis... right?
+    //NormalMap.g = 1 - NormalMap.g;
 
     //The delta position of light
     vec3 LightDir = vec3(LightPos.xy - (gl_FragCoord.xy / Resolution.xy), LightPos.z);

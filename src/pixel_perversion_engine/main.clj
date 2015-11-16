@@ -1,7 +1,7 @@
 (ns pixel-perversion-engine.main
   (:import [java_src Start]
            [com.badlogic.gdx.graphics.g2d SpriteBatch BitmapFont]
-           [com.badlogic.gdx.graphics GL20 Color OrthographicCamera]
+           [com.badlogic.gdx.graphics GL20 Color OrthographicCamera Texture]
            [com.badlogic.gdx Gdx]
            [com.pixel_perversion_engine.asset_manager Assets]
            [com.badlogic.gdx.utils.viewport FitViewport]
@@ -11,7 +11,8 @@
            [com.pixel_perversion_engine.box2d SpineBox2dController]
            [com.badlogic.gdx.math Vector2]
            [com.badlogic.gdx.graphics.glutils ShaderProgram]
-           [com.pixel_perversion_engine.shader TestShader_NMap])
+           [com.pixel_perversion_engine.shader TestShader_NMap]
+           [com.pixel_perversion_engine.tests Cube_3D])
   (:require [pixel-perversion-engine.config])
   (:use
     ;pixel-perversion-engine.scene.scene
@@ -44,6 +45,7 @@
 (def fragmentShader-BW nil)
 (def shaderProgram nil)
 (def testShader_NMap nil)
+(def testCube_3D nil)
 
 (defn create []
   (let [root (root 800 480)
@@ -59,7 +61,10 @@
   (set! (.-shaderProgram (.-spineDrawable (get-in @root-atomic [:render]))) shaderProgram)
   (set! (.-useShader (.-spineDrawable (get-in @root-atomic [:render]))) true)
 
-  (def testShader_NMap (new TestShader_NMap)))
+  (def testShader_NMap (new TestShader_NMap
+                            (new Texture (.internal Gdx/files "resources/cmap/cmap_brickwall.png"))
+                            (new Texture (.internal Gdx/files "resources/nmap/nmap_brickwall.png"))))
+  (def testCube_3D (new Cube_3D)))
 
 (defn render []
   (.glClearColor Gdx/gl 0 0 0 1)
@@ -81,6 +86,8 @@
   (.draw (.-spineDrawable (get-in @root-atomic [:render]))
          (get-in @root-atomic [:render])
          (get-in @root-atomic [:fit-viewport]))
+
+  (.render testCube_3D)
   )
 
 (defn resize [width height]
@@ -95,6 +102,7 @@
 
   ;(println "ALL OBJECTS DISPOSED!")
   (.dispose testShader_NMap)
+  (.dispose testCube_3D)
   )
 
 (Start/start
