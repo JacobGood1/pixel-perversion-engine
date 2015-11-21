@@ -11,7 +11,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import org.lwjgl.input.Mouse;
 
-public class TestShader_NMap{
+public class TestShader_NMap extends Shader{
     Texture cmap, nmap;
 
     SpriteBatch batch;

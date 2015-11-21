@@ -37,9 +37,12 @@
 
                 ;game elements
                 [:game :player]
+                [:game :player2]
                  ;update game last (box2d step)
                 [:game]
                 ])
+
+(def layers {:background 0 :midground 1 :foreground 2})
 
 (def vertexShader-BW nil)
 (def fragmentShader-BW nil)
@@ -48,18 +51,23 @@
 (def testCube_3D nil)
 
 (defn create []
-  (let [root (root 800 480)
-        game-attached (game root) ;(attach-object root [:game] (game root))
-        main-menu-attached (main-menu game-attached) ;(attach-object game-attached [:main-menu] (main-menu root))
-        root-final main-menu-attached
-        ]
-    (def root-atomic (atom root-final)))
-
   (def vertexShader-BW (.readString (.internal (Gdx/files) "src/pixel_perversion_engine/shader/greyscale/vertex.glsl")))
   (def fragmentShader-BW (.readString (.internal (Gdx/files) "src/pixel_perversion_engine/shader/greyscale/fragment.glsl")))
   (def shaderProgram (new ShaderProgram vertexShader-BW fragmentShader-BW))
-  (set! (.-shaderProgram (.-spineDrawable (get-in @root-atomic [:render]))) shaderProgram)
-  (set! (.-useShader (.-spineDrawable (get-in @root-atomic [:render]))) true)
+
+  (let [root (root 800 480)
+        game-attached (game root) ;(attach-object root [:game] (game root))
+        main-menu-attached (main-menu game-attached) ;(attach-object game-attached [:main-menu] (main-menu root))
+        root main-menu-attached
+
+        ;attach shaders
+        root (assoc root :shaders {:greyscale shaderProgram})
+        ]
+    (def root-atomic (atom root)))
+
+
+  ;(set! (.-shaderProgram (.-spineDrawable (get-in @root-atomic [:render]))) shaderProgram)
+  ;(set! (.-useShader (.-spineDrawable (get-in @root-atomic [:render]))) true)
 
   (def testShader_NMap (new TestShader_NMap
                             (new Texture (.internal Gdx/files "resources/cmap/cmap_brickwall.png"))
@@ -83,9 +91,11 @@
   (render-text @root-atomic "Hello world." 200 200)
   (.end (get-in @root-atomic [:sprite-batch]))
 
-  (.draw (.-spineDrawable (get-in @root-atomic [:render]))
+  (comment (.draw (.-spineDrawable (get-in @root-atomic [:render]))
          (get-in @root-atomic [:render])
-         (get-in @root-atomic [:fit-viewport]))
+         (get-in @root-atomic [:fit-viewport])))
+
+  (render-all @root-atomic)
 
   (.render testCube_3D)
   )

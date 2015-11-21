@@ -33,6 +33,7 @@
         root (update-in root [:dispose-list] conj box2d-world)
         ;attach player to game
         root (update-in root [:game :player] (fn [_] (player root)))
+        root (update-in root [:game :player2] (fn [_] (player2 root)))
         ;return result
         ]
     root

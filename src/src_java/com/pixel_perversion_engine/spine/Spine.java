@@ -3,6 +3,7 @@ package com.pixel_perversion_engine.spine;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.esotericsoftware.spine.*;
 import com.pixel_perversion_engine.render.Render;
 
@@ -58,7 +59,7 @@ public class Spine {
         //System.out.println("after update: " + skeleton.getRootBone().getScaleX());
 
         //add to render object //TODO z-index is hardcoded to 0 for testing...
-        render.spineDrawable.add(this, 0);
+        //render.spineDrawable.add(this, 0);
     }
 
     public Spine(AssetManager assetManager,

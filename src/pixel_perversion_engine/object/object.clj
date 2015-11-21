@@ -22,7 +22,9 @@
      :bitmap-font         bitmap-font
      :render              render
      :input               (new Input render)
-     :dispose-list         [sprite-batch bitmap-font]
+     :dispose-list        [sprite-batch bitmap-font]
+     :layers              {}
+     :shaders             {:normal nil}
      }
     ))
 
@@ -91,8 +93,34 @@
   [path]
   (get-in @(resolve 'root-atomic) path))
 
+(defn add-to-layer
+  [root layer-index render-index obj]
+  (let [contains-layer? (contains? (:layers root) layer-index)
+        root (if contains-layer?
+               root
+               (update-in root [:layers] (fn [layers]
+                                           (assoc layers layer-index {render-index []}))))]
+    (update-in root
+               [:layers layer-index render-index]
+               conj obj)))
+
+(defn attach
+  [root path obj]
+  (let [render? (contains? obj :render)
+        root (if render?
+               (add-to-layer
+                 root
+                 (get-in obj [:render :render-layer])
+                 (get-in obj [:render :render-index])
+                 obj)
+               root)
+        ]))
 
 ;BOOKMARK update heiarchy state ---
+(defn clear-renderables
+  [root]
+  (assoc root :layers {}))
+
 (defn apply-proc-to-obj
   "IMPORTANT: All procs return the root and NOT the object!"
   [root path]
@@ -106,6 +134,6 @@
 
 (defn update!
   [root paths]
-  (let [root-new (update-heiarchy @root paths)]
+  (let [root-new (update-heiarchy (clear-renderables @root) paths)]
     (swap! root conj root-new)))
 ;BOOKMARK update heiarchy state ---

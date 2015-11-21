@@ -56,6 +56,21 @@
 
     root))
 
+(defn update-spine!!
+  [root {:keys [path spine] :as object}]
+  (.update spine)
+
+  root)
+
+(defn render-obj
+  [root obj]
+  (let [r-l (get-in obj [:render :render-layer])
+        r-i (get-in obj [:render :render-index])
+        r   (get-in obj [:render :renderable])
+        s   (get-in obj [:render :shader])]
+
+    (add-to-layer root r-l r-i (:render obj))))
+
 (defn player
   [root]
   (let [spine (new Spine
@@ -63,18 +78,51 @@
                    (get-in root [:asset-manager]) "play/linear", "play/json/spider", 0, 0, 0.01)]
     (.setAnimation spine 0 "run" true)
 
-
     {
      :name             :player
      :type             [:player]
      :path             [:game :player] ;<- path should be calculated dynamically when attached to app heiarchy!
-     :proc             [spine-box2d-copyPos!! change-direction update-timeaaa];
+     :proc             [render-obj spine-box2d-copyPos!! change-direction update-timeaaa];
+
+     :render           {:render-layer 2;(:midground layers)
+                        :render-index 0
+                        :type :spine
+                        :renderable spine
+                        :shader :greyscale}
+
+     :position         [5 5]
+     :direction        [1 0]
+     ;create a spine object and set it's animation to 'run' and loop.
+     :spine            spine
+     :box2d-controller (new SpineBox2dController (get-in root [:game :box2d-world]) spine "collider_controller" "root")
+     :time 0.0
+     }))
+
+;TODO delete when done testing!
+(defn player2
+  [root]
+  (let [spine (new Spine
+                   (get-in root [:render])
+                   (get-in root [:asset-manager]) "play/linear", "play/json/spider", 0.5, -0.5, 0.01)]
+    (.setAnimation spine 0 "run" true)
+
+    {
+     :name             :player2
+     :type             [:player2]
+     :path             [:game :player2] ;<- path should be calculated dynamically when attached to app heiarchy!
+     :proc             [render-obj update-timeaaa update-spine!!];
+
+     :render           {:render-layer 2
+                        :render-index 1
+                        :type :spine
+                        :renderable spine
+                        :shader :normal}
 
      :position         [0 0]
      :direction        [1 0]
      ;create a spine object and set it's animation to 'run' and loop.
      :spine            spine
-     :box2d-controller (new SpineBox2dController (get-in root [:game :box2d-world]) spine "collider_controller" "root")
+     ;:box2d-controller (new SpineBox2dController (get-in root [:game :box2d-world]) spine "collider_controller" "root")
      :time 0.0
      }))
 

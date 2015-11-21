@@ -17,6 +17,7 @@ import java.util.HashMap;
 /**
  * Created by Travis on 6/30/2015.
  *
+ * !!!DEPRECATED!!!
  */
 public class SpineDrawable implements Drawable{
     protected Array invalid = new Array();
