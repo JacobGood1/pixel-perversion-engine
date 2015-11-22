@@ -6,6 +6,7 @@
            [com.pixel_perversion_engine.render Render]
            [com.pixel_perversion_engine.input Input]))
 
+;TODO some stuff that exists in root also exists in Render such as sprite-batch... this is very bad stuff!
 (defn root
   [width height]
   (let [orthographic-camera (new OrthographicCamera (float width) (float height))
@@ -17,7 +18,7 @@
      :name                :root
      :asset-manager       (new Assets)
      :orthographic-camera orthographic-camera
-     :fit-viewport        (new FitViewport (float (* (* 0.001 5) 800)) (float (* (* 0.001 5) 480)) orthographic-camera)
+     :fit-viewport        (new FitViewport (float 800) (float 480) orthographic-camera) ;(float (* (* 0.001 5) 800)) (float (* (* 0.001 5) 480))
      :sprite-batch        sprite-batch
      :bitmap-font         bitmap-font
      :render              render

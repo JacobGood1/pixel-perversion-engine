@@ -75,7 +75,7 @@
   [root]
   (let [spine (new Spine
                    (get-in root [:render])
-                   (get-in root [:asset-manager]) "play/linear", "play/json/spider", 0, 0, 0.01)]
+                   (get-in root [:asset-manager]) "play/linear", "play/json/spider", 0, 0, 1.0)];0.01
     (.setAnimation spine 0 "run" true)
 
     {
@@ -103,7 +103,7 @@
   [root]
   (let [spine (new Spine
                    (get-in root [:render])
-                   (get-in root [:asset-manager]) "play/linear", "play/json/spider", 0.5, -0.5, 0.01)]
+                   (get-in root [:asset-manager]) "play/linear", "play/json/spider", 200, -200, 1.0)]
     (.setAnimation spine 0 "run" true)
 
     {

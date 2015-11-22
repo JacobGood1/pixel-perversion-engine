@@ -9,10 +9,11 @@
            [com.pixel_perversion_engine.spine Spine]
            [com.badlogic.gdx.physics.box2d World]
            [com.pixel_perversion_engine.box2d SpineBox2dController]
-           [com.badlogic.gdx.math Vector2]
-           [com.badlogic.gdx.graphics.glutils ShaderProgram]
+           [com.badlogic.gdx.math Vector2 Vector3]
+           [com.badlogic.gdx.graphics.glutils ShaderProgram ShapeRenderer$ShapeType]
            [com.pixel_perversion_engine.shader TestShader_NMap]
-           [com.pixel_perversion_engine.tests Cube_3D])
+           [com.pixel_perversion_engine.tests Cube_3D]
+           [org.lwjgl.input Mouse])
   (:require [pixel-perversion-engine.config])
   (:use
     ;pixel-perversion-engine.scene.scene
@@ -49,6 +50,7 @@
 (def shaderProgram nil)
 (def testShader_NMap nil)
 (def testCube_3D nil)
+(defonce vec3 nil)
 
 (defn create []
   (def vertexShader-BW (.readString (.internal (Gdx/files) "src/pixel_perversion_engine/shader/greyscale/vertex.glsl")))
@@ -72,7 +74,8 @@
   (def testShader_NMap (new TestShader_NMap
                             (new Texture (.internal Gdx/files "resources/cmap/cmap_brickwall.png"))
                             (new Texture (.internal Gdx/files "resources/nmap/nmap_brickwall.png"))))
-  (def testCube_3D (new Cube_3D)))
+  (def testCube_3D (new Cube_3D))
+  (def vec3 (new Vector3)))
 
 (defn render []
   (.glClearColor Gdx/gl 0 0 0 1)
@@ -91,13 +94,32 @@
   (render-text @root-atomic "Hello world." 200 200)
   (.end (get-in @root-atomic [:sprite-batch]))
 
-  (comment (.draw (.-spineDrawable (get-in @root-atomic [:render]))
-         (get-in @root-atomic [:render])
-         (get-in @root-atomic [:fit-viewport])))
-
   (render-all @root-atomic)
 
   (.render testCube_3D)
+
+  (let [grid-size 32.0
+        x (.getX Gdx/input);(Mouse/getX);(/ (Mouse/getX) (float (.getWidth Gdx/graphics)))
+        y (.getY Gdx/input);(Mouse/getY);(/ (Mouse/getY) (float (.getHeight Gdx/graphics)))
+        camera (.getCamera (:fit-viewport @root-atomic))
+
+        shape-renderer (.getShapeRenderer (:render @root-atomic))]
+    ;(println (mod x grid-size))
+    ;(println [snap-x snap-y])
+    ;(println (.getY Gdx/input))
+    (set! (.-x vec3) x)
+    (set! (.-y vec3) y)
+    (.unproject camera vec3)
+    (let [x (.-x vec3)
+          y (.-y vec3)
+          snap-x (- x (mod x grid-size))
+          snap-y (- y (mod y grid-size))]
+      (println snap-x)
+      (.setProjectionMatrix shape-renderer (.-combined camera))
+      (.begin shape-renderer ShapeRenderer$ShapeType/Filled)
+      (.rect shape-renderer snap-x snap-y 32.0 32.0)
+      (.end shape-renderer)
+      ))
   )
 
 (defn resize [width height]
