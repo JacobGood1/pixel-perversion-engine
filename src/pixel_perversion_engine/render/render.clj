@@ -30,34 +30,37 @@
                                common-type nil
                                common-shader nil
                                ]
-
                           (cond (empty? i-f) batch
                                 (nil? common-type) (recur (rest i-f) (conj batch [(first i-f)]) (:type (first i-f)) (:shader (first i-f)))
                                 (and (= common-type   (:type (first i-f)))
-                                     (= common-shader (:shader (first i-f)))) (recur (rest i-f)
-                                                                                     (conj (drop-last batch) (conj (last batch) (first i-f))) common-type common-shader)
+                                     (= common-shader (:shader (first i-f))))
+                                (recur (rest i-f)
+                                       (conj (vec (drop-last batch)) ;<- FUUUUUUUUUUUUUUUUU watch your implicit conversions!!!
+                                                                     ;drop-last casts the collect to a list which causes conj to act differently!
+                                                                     ;fixed by casting it back to a vector.
+                                             (conj (last batch)
+                                                   (first i-f)))
+                                       common-type common-shader)
                                 :default (recur (rest i-f) (conj batch [(first i-f)]) (:type (first i-f)) (:shader (first i-f)))
                                 )
                           )
         ]
+    ;(println indices-batched)
     ;indices-batched
 
     ;render batch
     ;(comment
       (doseq [batch indices-batched]
-          (cond (empty? batch) nil
-                :default (let [spine 'spine/render
-                             sprite 'sprite/render
-                             batchf (first batch)]
-                         ((cond (= :spine (batchf :type)) spine/render
-                                :default sprite/render)
-                           (:render root) ;Spine/draw ;spine/render
-                           (:fit-viewport root)
-                           ;com.pixel_perversion_engine.spine.Spine
-                           ;(into-array com.pixel_perversion_engine.spine.Spine [(:renderable i)])
-                           batch
-                           ((:shader (first batch)) (:shaders root)));(:greyscale (:shaders root))) ;(:shader (first batch))
-                         )))
+        (let [batchf (first batch)]
+          ;(println batch)
+          ((cond (= :spine (batchf :type)) spine/render
+                 (= :sprite (batchf :type)) sprite/render
+                 :default nil)
+            (:render root)
+            (:fit-viewport root)
+            batch
+            ((:shader (first batch)) (:shaders root)))
+          ))
      ;)
 
     indices-batched

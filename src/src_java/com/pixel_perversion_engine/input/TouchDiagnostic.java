@@ -175,7 +175,15 @@ public class TouchDiagnostic {
         return this.coordinate;
         //return coordinateDragged;
     }
-    public Vector2 getCoordinateHover(){ return coordinateHover; }
+    public Vector2 getCoordinateHover(Viewport viewport){
+        unproject.x = coordinateHover.x;
+        unproject.y = coordinateHover.y;
+        Vector3 coordinate = viewport.getCamera().unproject(unproject);//world.getRender().camera.getCamera(cameraType).unproject(unproject);
+        this.coordinate.x = coordinate.x;
+        this.coordinate.y = coordinate.y;
+        return this.coordinate;
+        //return coordinateHover;
+    }
 
     public Vector2 getCoordinatePressed_raw() {
         return coordinatePressed_raw;

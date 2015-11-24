@@ -86,14 +86,16 @@ public class TestShader_NMap extends Shader{
         shader.end();
 
         //handle mouse wheel
+        /*
         Gdx.input.setInputProcessor(new InputAdapter() {
             public boolean scrolled(int delta) {
                 //LibGDX mouse wheel is inverted compared to lwjgl-basics
                 LIGHT_POS.z = Math.max(0f, LIGHT_POS.z - (delta * 0.005f));
-                System.out.println("New light Z: "+LIGHT_POS.z);
+                //System.out.println("New light Z: "+LIGHT_POS.z);
                 return true;
             }
         });
+        */
     }
 
     public void resize(int width, int height) {
@@ -113,7 +115,7 @@ public class TestShader_NMap extends Shader{
         //reset light Z
         if (Gdx.input.isTouched()) {
             LIGHT_POS.z = DEFAULT_LIGHT_Z;
-            System.out.println("New light Z: "+LIGHT_POS.z);
+            //System.out.println("New light Z: "+LIGHT_POS.z);
         }
 
         batch.begin();

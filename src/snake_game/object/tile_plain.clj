@@ -26,9 +26,8 @@
   )
 
 (defn tile-plain
-  [root]
+  [root position]
   (let [size 32
-        position [0.0 0.0]
         sprite (.createSprite
                  (.get (get-in root [:asset-manager])
                        "resources/texture_atlas/terrain/terrain_atlas.atlas" TextureAtlas)
@@ -37,8 +36,8 @@
      :type     :tile
      :size     32
      :path     [:game :tile-plain] ;<- path should be calculated dynamically when attached to app heiarchy!
-     :proc     [update-position render-obj];
-     :render   {:render-layer 2;(:midground layers)
+     :proc     [ render-obj];update-position
+     :render   {:render-layer 5;(:midground layers)
                 :render-index 0
                 :type :sprite
                 :renderable sprite

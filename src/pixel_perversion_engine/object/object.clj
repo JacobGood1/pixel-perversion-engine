@@ -122,16 +122,34 @@
   [root]
   (assoc root :layers {}))
 
-(defn apply-proc-to-obj
+(defn *apply-proc-to-obj
   "IMPORTANT: All procs return the root and NOT the object!"
   [root path]
   (reduce (fn [root fn] (fn root (get-in root path)))
           root
           (:proc (get-in root path))))
 
+(defn **gen-path
+  [root path]
+  (map (fn [k]
+         (conj path k)) (for [[k v_] (get-in root path)] (keyword k))))
+
+(defn construct-paths
+  [root paths]
+  (loop [paths paths
+         final-paths []]
+    (let [path-type (first (first paths))
+          path (second (first paths))]
+      (cond (empty? paths) final-paths
+            (= path-type :*) (recur (rest paths) (conj final-paths path))
+            :default         (recur (rest paths) (apply conj final-paths (**gen-path root path)))))
+    ))
+
 (defn update-heiarchy
   [root paths]
-  (reduce (fn [root path] (apply-proc-to-obj root path)) root paths))
+  (let [c (construct-paths root paths)]
+    ;(println c)
+  (reduce (fn [root path] (*apply-proc-to-obj root path)) root c)))
 
 (defn update!
   [root paths]

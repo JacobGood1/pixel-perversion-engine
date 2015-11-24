@@ -21,11 +21,15 @@
         ;create game object
         box2d-world (new World (new Vector2 (float 0) (float 0)) false) ;gravity -9.18
         game (object/check-object {
-                            :name        :game
-                            :path        [:game]
-                            :type        [:game]
-                            :proc        [step-box2d-world]
-                            :box2d-world box2d-world
+                                   :name         :game
+                                   :path         [:game]
+                                   :type         [:game]
+                                   :proc         [step-box2d-world]
+                                   :box2d-world  box2d-world
+
+                                   ;:player       (player/player root)
+                                   ;:player2      (player/player2 root)
+                                   :tile-plain   {};(tile-plain/tile-plain root [0.0 0.0])
                             })
 
         ;attach game to root
@@ -36,7 +40,7 @@
 
         root (update-in root [:game :player] (fn [_] (player/player root)))
         root (update-in root [:game :player2] (fn [_] (player/player2 root)))
-        root (update-in root [:game :tile-plain] (fn [_] (tile-plain/tile-plain root)))
+        ;root (update-in root [:game :tile-plain] (fn [_] (tile-plain/tile-plain root [0.0 0.0])))
         ;return result
         ]
     root

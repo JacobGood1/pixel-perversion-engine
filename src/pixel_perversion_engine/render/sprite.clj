@@ -6,14 +6,6 @@
            [com.badlogic.gdx.utils.viewport Viewport]
            [com.badlogic.gdx.graphics.g2d TextureRegion]))
 
-(def fbo nil)
-(def fbo-region nil)
-
-(defn setup-render
-  []
-  (def fbo (new FrameBuffer Pixmap$Format/RGBA8888 800 480 false))
-  (def fbo-region (new TextureRegion (.getColorBufferTexture fbo) 0 0 800 480)))
-
 (defn render
   [^Render render ^Viewport viewport objs shader-program]
   (let [

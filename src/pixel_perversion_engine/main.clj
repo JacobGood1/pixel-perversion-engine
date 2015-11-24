@@ -23,7 +23,8 @@
     snake-game.object.game
     snake-game.object.player
     )
-  (:require [pixel-perversion-engine.render.spine :as spine-r]))
+  (:require [pixel-perversion-engine.render.spine :as spine-r]
+            [snake-game.map-editor.map_editor :as map-editor]))
 
 (defonce root-atomic nil)
 
@@ -34,15 +35,18 @@
            :height 480
            :use-gl-30 false))
 
-(def proc_path [
+(def proc-path [
                 ;[:main-menu]
-
                 ;game elements
-                [:game :player]
-                [:game :player2]
-                [:game :tile-plain]
+                [:*   [:game :player]]
+                [:*   [:game :player2]]
+                [:**  [:game :tile-plain]]
                  ;update game last (box2d step)
-                [:game]
+                [:*   [:game]]
+
+                ;map-editor elements
+                [:*   [:map-editor :brush]]
+                [:*   [:map-editor]]
                 ])
 
 (def layers {:background 0 :midground 1 :foreground 2})
@@ -53,17 +57,18 @@
 (def testShader_NMap nil)
 (def testCube_3D nil)
 
-(defonce vec3 nil)
-
 (defn create []
   (def vertexShader-BW (.readString (.internal (Gdx/files) "src/pixel_perversion_engine/shader/greyscale/vertex.glsl")))
   (def fragmentShader-BW (.readString (.internal (Gdx/files) "src/pixel_perversion_engine/shader/greyscale/fragment.glsl")))
   (def shaderProgram (new ShaderProgram vertexShader-BW fragmentShader-BW))
   (spine-r/setup-render)
   (let [root (root 800 480)
-        game-attached (game root) ;(attach-object root [:game] (game root))
-        main-menu-attached (main-menu game-attached) ;(attach-object game-attached [:main-menu] (main-menu root))
-        root main-menu-attached
+        ;attach game
+        root (game root) ;(attach-object root [:game] (game root))
+        ;attach map-editor
+        root (map-editor/map-editor root)
+        ;attach root
+        root (main-menu root) ;(attach-object game-attached [:main-menu] (main-menu root))
 
         ;attach shaders
         root (assoc root :shaders {:greyscale shaderProgram})
@@ -80,7 +85,6 @@
                             (new Texture (.internal Gdx/files "resources/cmap/cmap_brickwall.png"))
                             (new Texture (.internal Gdx/files "resources/nmap/nmap_brickwall.png"))))
   (def testCube_3D (new Cube_3D))
-  (def vec3 (new Vector3))
   )
 
 (defn render []
@@ -90,48 +94,25 @@
   (.render testShader_NMap)
 
   ;update all app logic
-  (update! root-atomic proc_path)
+  (update! root-atomic proc-path)
 
   ;update viewport
   (.update (get-in @root-atomic [:fit-viewport]) (float 800) (float 480))
 
-  (time
-    (render-all @root-atomic)
-    )
+  (render-all @root-atomic)
 
   ;(.render testCube_3D)
 
-  (let [grid-size 16.0
-        x (.getX Gdx/input);(Mouse/getX);(/ (Mouse/getX) (float (.getWidth Gdx/graphics)))
-        y (.getY Gdx/input);(Mouse/getY);(/ (Mouse/getY) (float (.getHeight Gdx/graphics)))
-        camera (.getCamera (:fit-viewport @root-atomic))
 
-        shape-renderer (.getShapeRenderer (:render @root-atomic))]
-    ;(println (mod x grid-size))
-    ;(println [snap-x snap-y])
-    ;(println (.getY Gdx/input))
-    (set! (.-x vec3) x)
-    (set! (.-y vec3) y)
-    (.apply (:fit-viewport @root-atomic) false)
-    (.unproject camera vec3)
-    (let [x (.-x vec3)
-          y (.-y vec3)
-          snap-x (- x (mod x grid-size))
-          snap-y (- y (mod y grid-size))]
-      ;(println snap-x)
-      (.setProjectionMatrix shape-renderer (.-combined camera))
-      (.begin shape-renderer ShapeRenderer$ShapeType/Filled)
-      (.rect shape-renderer snap-x snap-y 16.0 16.0)
-      (.end shape-renderer)
-      ))
 
   ;BOOKMARK println fps
   ;(println (.getFramesPerSecond Gdx/graphics))
   ;BOOKMARK render fps
-  ;kek
   (.begin (get-in @root-atomic [:sprite-batch]))
   (render-text @root-atomic (str (.getFramesPerSecond Gdx/graphics)) 200 200)
   (.end (get-in @root-atomic [:sprite-batch]))
+
+  (.update (get-in @root-atomic [:input]))
   )
 
 (defn resize [width height]
