@@ -135,6 +135,6 @@
 
 (defn update!
   [root paths]
-  (let [root-new (update-heiarchy (clear-renderables @root) paths)]
+  (let [root-new (update-heiarchy (clear-renderables @root) paths)] ;(get-in root [:layers]) (clear-renderables @root)
     (swap! root conj root-new)))
 ;BOOKMARK update heiarchy state ---

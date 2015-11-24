@@ -1,6 +1,6 @@
 (ns pixel-perversion-engine.main
   (:import [java_src Start]
-           [com.badlogic.gdx.graphics.g2d SpriteBatch BitmapFont]
+           [com.badlogic.gdx.graphics.g2d SpriteBatch BitmapFont TextureRegion TextureAtlas Sprite]
            [com.badlogic.gdx.graphics GL20 Color OrthographicCamera Texture]
            [com.badlogic.gdx Gdx]
            [com.pixel_perversion_engine.asset_manager Assets]
@@ -22,7 +22,8 @@
     snake-game.object.main-menu
     snake-game.object.game
     snake-game.object.player
-    ))
+    )
+  (:require [pixel-perversion-engine.render.spine :as spine-r]))
 
 (defonce root-atomic nil)
 
@@ -39,6 +40,7 @@
                 ;game elements
                 [:game :player]
                 [:game :player2]
+                [:game :tile-plain]
                  ;update game last (box2d step)
                 [:game]
                 ])
@@ -50,13 +52,14 @@
 (def shaderProgram nil)
 (def testShader_NMap nil)
 (def testCube_3D nil)
+
 (defonce vec3 nil)
 
 (defn create []
   (def vertexShader-BW (.readString (.internal (Gdx/files) "src/pixel_perversion_engine/shader/greyscale/vertex.glsl")))
   (def fragmentShader-BW (.readString (.internal (Gdx/files) "src/pixel_perversion_engine/shader/greyscale/fragment.glsl")))
   (def shaderProgram (new ShaderProgram vertexShader-BW fragmentShader-BW))
-
+  (spine-r/setup-render)
   (let [root (root 800 480)
         game-attached (game root) ;(attach-object root [:game] (game root))
         main-menu-attached (main-menu game-attached) ;(attach-object game-attached [:main-menu] (main-menu root))
@@ -64,7 +67,9 @@
 
         ;attach shaders
         root (assoc root :shaders {:greyscale shaderProgram})
-        ]
+        ;testing viewport zooming
+        camera (.getCamera (get-in root [:fit-viewport]))]
+    ;(set! (.-zoom camera) 0.5) ;<-- converts screen from 16px to 32px
     (def root-atomic (atom root)))
 
 
@@ -75,7 +80,8 @@
                             (new Texture (.internal Gdx/files "resources/cmap/cmap_brickwall.png"))
                             (new Texture (.internal Gdx/files "resources/nmap/nmap_brickwall.png"))))
   (def testCube_3D (new Cube_3D))
-  (def vec3 (new Vector3)))
+  (def vec3 (new Vector3))
+  )
 
 (defn render []
   (.glClearColor Gdx/gl 0 0 0 1)
@@ -89,16 +95,13 @@
   ;update viewport
   (.update (get-in @root-atomic [:fit-viewport]) (float 800) (float 480))
 
-  ;render result
-  (.begin (get-in @root-atomic [:sprite-batch]))
-  (render-text @root-atomic "Hello world." 200 200)
-  (.end (get-in @root-atomic [:sprite-batch]))
+  (time
+    (render-all @root-atomic)
+    )
 
-  (render-all @root-atomic)
+  ;(.render testCube_3D)
 
-  (.render testCube_3D)
-
-  (let [grid-size 32.0
+  (let [grid-size 16.0
         x (.getX Gdx/input);(Mouse/getX);(/ (Mouse/getX) (float (.getWidth Gdx/graphics)))
         y (.getY Gdx/input);(Mouse/getY);(/ (Mouse/getY) (float (.getHeight Gdx/graphics)))
         camera (.getCamera (:fit-viewport @root-atomic))
@@ -109,17 +112,25 @@
     ;(println (.getY Gdx/input))
     (set! (.-x vec3) x)
     (set! (.-y vec3) y)
+    (.apply (:fit-viewport @root-atomic) false)
     (.unproject camera vec3)
     (let [x (.-x vec3)
           y (.-y vec3)
           snap-x (- x (mod x grid-size))
           snap-y (- y (mod y grid-size))]
-      (println snap-x)
+      ;(println snap-x)
       (.setProjectionMatrix shape-renderer (.-combined camera))
       (.begin shape-renderer ShapeRenderer$ShapeType/Filled)
-      (.rect shape-renderer snap-x snap-y 32.0 32.0)
+      (.rect shape-renderer snap-x snap-y 16.0 16.0)
       (.end shape-renderer)
       ))
+
+  ;BOOKMARK println fps
+  ;(println (.getFramesPerSecond Gdx/graphics))
+  ;BOOKMARK render fps
+  (.begin (get-in @root-atomic [:sprite-batch]))
+  (render-text @root-atomic (str (.getFramesPerSecond Gdx/graphics)) 200 200)
+  (.end (get-in @root-atomic [:sprite-batch]))
   )
 
 (defn resize [width height]
@@ -132,6 +143,7 @@
   (let [dispose-seq (for [obj (get-in @root-atomic [:dispose-list])] obj)]
     (map (fn [obj] (.dispose obj)) dispose-seq))
 
+  (spine-r/dispose-render)
   ;(println "ALL OBJECTS DISPOSED!")
   (.dispose testShader_NMap)
   (.dispose testCube_3D)

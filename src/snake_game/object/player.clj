@@ -90,7 +90,7 @@
                         :renderable spine
                         :shader :greyscale}
 
-     :position         [5 5]
+     :position         [0 0]
      :direction        [1 0]
      ;create a spine object and set it's animation to 'run' and loop.
      :spine            spine

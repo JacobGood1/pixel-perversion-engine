@@ -2,7 +2,8 @@
   (:import [com.badlogic.gdx.graphics.g2d SpriteBatch BitmapFont]
            [com.pixel_perversion_engine.render Spine]
            [com.badlogic.gdx.utils Array])
-  (:use [pixel-perversion-engine.render.spine]))
+  (require [pixel-perversion-engine.render.spine :as spine]
+           [pixel-perversion-engine.render.sprite :as sprite]))
 
 (defn render-all
   [{:keys [layers] :as root}]
@@ -43,36 +44,24 @@
 
     ;render batch
     ;(comment
-      (loop [batch indices-batched]
-        (let [batch-f (first batch)]
-        ;(println (first (first batch)))
-        (cond (empty? batch) nil
-              :default (do (render (:render root) ;Spine/draw
-                                   (:fit-viewport root)
-                                   ;com.pixel_perversion_engine.spine.Spine
-                                   ;(into-array com.pixel_perversion_engine.spine.Spine [(:renderable i)])
-                                   batch-f
-                                   ((:shader (first batch-f)) (:shaders root)));(:greyscale (:shaders root))) ;(:shader (first batch))
-                           (recur (rest batch))))))
-     ; )
+      (doseq [batch indices-batched]
+          (cond (empty? batch) nil
+                :default (let [spine 'spine/render
+                             sprite 'sprite/render
+                             batchf (first batch)]
+                         ((cond (= :spine (batchf :type)) spine/render
+                                :default sprite/render)
+                           (:render root) ;Spine/draw ;spine/render
+                           (:fit-viewport root)
+                           ;com.pixel_perversion_engine.spine.Spine
+                           ;(into-array com.pixel_perversion_engine.spine.Spine [(:renderable i)])
+                           batch
+                           ((:shader (first batch)) (:shaders root)));(:greyscale (:shaders root))) ;(:shader (first batch))
+                         )))
+     ;)
 
     indices-batched
     )
-  )
-
-(comment
-  (doseq [i indices-flattened] (cond (= (:type i) :spine)
-                                     (Spine/draw (:render root)
-                                                 (:fit-viewport root)
-                                                 ;com.pixel_perversion_engine.spine.Spine
-                                                 ;(into-array com.pixel_perversion_engine.spine.Spine [(:renderable i)])
-                                                 (let [ar (new Array)]
-                                                   (.add ar (:renderable i))
-                                                   ar)
-                                                 ((:shader i) (:shaders root))
-                                                 )
-
-                                     :default nil))
   )
 
 (defn render-text
@@ -80,3 +69,24 @@
   (.draw (get-in root [:bitmap-font])
          (get-in root [:sprite-batch])
          text (float x) (float y)))
+
+
+
+;render performance bottle-kneck
+(comment
+  (loop [batch indices-batched]
+    (let [batch-f (first batch)]
+      (cond (empty? batch) nil
+            :default (let [spine 'spine/render
+                           sprite 'sprite/render
+                           batch-ff (first batch-f)]
+                       ((cond (= :spine (batch-ff :type)) spine/render
+                              :default sprite/render)
+                         (:render root) ;Spine/draw ;spine/render
+                         (:fit-viewport root)
+                         ;com.pixel_perversion_engine.spine.Spine
+                         ;(into-array com.pixel_perversion_engine.spine.Spine [(:renderable i)])
+                         batch-f
+                         ((:shader (first batch-f)) (:shaders root)));(:greyscale (:shaders root))) ;(:shader (first batch))
+                       (recur (rest batch))))))
+  )
