@@ -128,6 +128,7 @@
   ;BOOKMARK println fps
   ;(println (.getFramesPerSecond Gdx/graphics))
   ;BOOKMARK render fps
+  ;kek
   (.begin (get-in @root-atomic [:sprite-batch]))
   (render-text @root-atomic (str (.getFramesPerSecond Gdx/graphics)) 200 200)
   (.end (get-in @root-atomic [:sprite-batch]))
