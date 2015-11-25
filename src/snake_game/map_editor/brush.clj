@@ -1,6 +1,7 @@
 (ns snake-game.map-editor.brush
   (:import [com.badlogic.gdx Gdx]
-           [com.badlogic.gdx.graphics.glutils ShapeRenderer$ShapeType])
+           [com.badlogic.gdx.graphics.glutils ShapeRenderer$ShapeType]
+           [com.badlogic.gdx.graphics GL20 Color])
   (:use [snake-game.object.terrain.grass.terrain-grass-generator]))
 
 ;TODO all brush states are currently hardcoded to use only [:game :tile-plain]
@@ -93,8 +94,8 @@
   (println "brush!"))
 
 (defn update-brush
-  [root {:keys [position] :as brush}]
-  (let [grid-size 16.0
+  [root {:keys [position tile-preview-color-add] :as brush}]
+  (let [grid-size (get-in root [:map-editor :grid-size])
         input (:input root)
         viewport (:fit-viewport root)
         touch-diagnostic (first (.-touchDiagnostic input))
@@ -111,21 +112,27 @@
           snap-y (- y (mod y grid-size))]
       ;(println snap-x)
       (.setProjectionMatrix shape-renderer (.-combined camera))
-      (.begin shape-renderer ShapeRenderer$ShapeType/Filled)
-      (.rect shape-renderer snap-x snap-y 16.0 16.0)
+      (.glEnable Gdx/gl GL20/GL_BLEND)
+      (.glBlendFunc Gdx/gl GL20/GL_SRC_ALPHA GL20/GL_ONE_MINUS_SRC_ALPHA)
+      (.begin shape-renderer ShapeRenderer$ShapeType/Line)
+      (.setColor shape-renderer tile-preview-color-add)
+      (.rect shape-renderer snap-x snap-y grid-size grid-size)
       (.end shape-renderer)
+      (.glDisable Gdx/gl GL20/GL_BLEND)
 
       (update-in root [:map-editor :brush] (fn [brush] (assoc brush :position [snap-x snap-y]))))))
 
 (defn brush
   [root]
-  {:name :brush
-   :type [:brush]
-   :path [:map-editor :brush] ;<- path should be calculated dynamically when attached to app heiarchy!
-   :proc [update-brush stamp] ;
+  {:name                      :brush
+   :type                      [:brush]
+   :path                      [:map-editor :brush] ;<- path should be calculated dynamically when attached to app heiarchy!
+   :proc                      [update-brush stamp] ;
 
-   :state :stamp ;:paint :stamp :box-select :single-select
-   :position [0.0 0.0]
+   :state                     :stamp ;:paint :stamp :box-select :single-select
+   :position                  [0.0 0.0]
+   :tile-preview-color-add    (new Color 0.0 1.0 0.0 1.0)
+   :tile-preview-color-delete (new Color 1.0 0.0 0.0 1.0)
    })
 
 (comment [input (:input root)

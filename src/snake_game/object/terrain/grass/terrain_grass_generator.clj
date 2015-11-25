@@ -28,12 +28,12 @@
 
 (defn terrain-grass-generator
   [root name position atlas-name]
-  (let [size 16
+  (let [size (get-in root [:map-editor :grid-size])
         sprite (.createSprite
                  (.get (get-in root [:asset-manager])
                        "resources/texture_atlas/terrain/terrain_atlas.atlas" TextureAtlas)
                  (str atlas-name))]
-    {:name       name ;:tile-plain
+    {:name       name
      :type       :tile
      :size       size
      :path       [:game :terrain-grass] ;<- path should be calculated dynamically when attached to app heiarchy!

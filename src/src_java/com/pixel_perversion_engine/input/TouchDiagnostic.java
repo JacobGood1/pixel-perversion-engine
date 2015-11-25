@@ -33,6 +33,9 @@ public class TouchDiagnostic {
     private Vector2 coordinateDragged_raw;
     private Vector2 coordinateHover_raw;
 
+    public Vector2 dragDisplacement = new Vector2(0,0);
+    private Vector2 prevPos = new Vector2(0,0);
+
     public enum ActionTypes {
         Pressed,
         Held,
@@ -103,6 +106,11 @@ public class TouchDiagnostic {
     public void setCoordinatePressed_raw(float x, float y){
         this.coordinatePressed_raw.x = x;
         this.coordinatePressed_raw.y = y;
+
+        if (touchPressed) {
+            this.prevPos.x = x;
+            this.prevPos.y = y;
+        }
     }
 
     public void setCoordinateHeld(float x, float y){
@@ -130,6 +138,14 @@ public class TouchDiagnostic {
     public void setCoordinateDragged_raw(float x, float y){
         this.coordinateDragged_raw.x = x;
         this.coordinateDragged_raw.y = y;
+
+
+        dragDisplacement.x = x - prevPos.x;
+        dragDisplacement.y = prevPos.y - y;
+
+        prevPos.x = coordinateDragged_raw.x;
+        prevPos.y = coordinateDragged_raw.y;
+
     }
 
     public void setCoordinateHover(float x, float y){
@@ -186,6 +202,9 @@ public class TouchDiagnostic {
     }
 
     public Vector2 getCoordinatePressed_raw() {
+        return coordinatePressed_raw;
+    }
+    public Vector2 getCoordinateHeld_raw() {
         return coordinatePressed_raw;
     }
     public Vector2 getCoordinateReleased_raw() {
