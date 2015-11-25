@@ -1,6 +1,7 @@
 (ns snake-game.map-editor.map_editor
   (:use pixel-perversion-engine.object.object)
-  (:require [snake-game.map-editor.brush :as brush])
+  (:require [snake-game.map-editor.brush :as brush]
+            [snake-game.map-editor.gui :as gui])
   (:import [com.badlogic.gdx.graphics.glutils ShapeRenderer$ShapeType]
            [com.badlogic.gdx.math Vector3]))
 
@@ -17,6 +18,7 @@
                                   :tiles []
                                   :brush (brush/brush root)
                                   :vec3  (new Vector3)
+                                  :gui   (gui/gui root)
                                   })
         ;attach map-editor to root
         root (assoc root :map-editor map-editor)]

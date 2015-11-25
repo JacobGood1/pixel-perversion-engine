@@ -1,7 +1,6 @@
 (ns snake-game.object.game
   (:require [pixel-perversion-engine.object.object :as object]
-        [snake-game.object.player :as player]
-        [snake-game.object.tile-plain :as tile-plain])
+            [snake-game.object.player :as player])
   (:import [com.badlogic.gdx.math Vector2]
            [com.badlogic.gdx.physics.box2d World]))
 
@@ -38,8 +37,11 @@
         root (update-in root [:dispose-list] conj box2d-world)
         ;attach player to game
 
-        root (update-in root [:game :player] (fn [_] (player/player root)))
-        root (update-in root [:game :player2] (fn [_] (player/player2 root)))
+        ;testing player
+        ;root (update-in root [:game :player] (fn [_] (player/player root)))
+        ;root (update-in root [:game :player2] (fn [_] (player/player2 root)))
+
+        ;testing tile
         ;root (update-in root [:game :tile-plain] (fn [_] (tile-plain/tile-plain root [0.0 0.0])))
         ;return result
         ]

@@ -1,12 +1,75 @@
 
 terrain_atlas.png
-size: 32,32
+size: 256,32
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-terrain_grass
+terrain-grass-bottom-left
   rotate: false
   xy: 2, 2
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+terrain-grass-bottom-mid
+  rotate: false
+  xy: 20, 2
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+terrain-grass-bottom-right
+  rotate: false
+  xy: 38, 2
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+terrain-grass-mid-left
+  rotate: false
+  xy: 56, 2
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+terrain-grass-mid-mid
+  rotate: false
+  xy: 74, 2
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+terrain-grass-mid-right
+  rotate: false
+  xy: 92, 2
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+terrain-grass-single
+  rotate: false
+  xy: 110, 2
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+terrain-grass-top-left
+  rotate: false
+  xy: 128, 2
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+terrain-grass-top-mid
+  rotate: false
+  xy: 146, 2
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+terrain-grass-top-right
+  rotate: false
+  xy: 164, 2
   size: 16, 16
   orig: 16, 16
   offset: 0, 0

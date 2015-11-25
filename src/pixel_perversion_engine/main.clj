@@ -40,11 +40,12 @@
                 ;game elements
                 [:*   [:game :player]]
                 [:*   [:game :player2]]
-                [:**  [:game :tile-plain]]
+                [:**  [:game :terrain-grass]]
                  ;update game last (box2d step)
                 [:*   [:game]]
 
                 ;map-editor elements
+                [:*   [:map-editor :gui]]
                 [:*   [:map-editor :brush]]
                 [:*   [:map-editor]]
                 ])
@@ -56,6 +57,7 @@
 (def shaderProgram nil)
 (def testShader_NMap nil)
 (def testCube_3D nil)
+(def projMatrix4 nil)
 
 (defn create []
   (def vertexShader-BW (.readString (.internal (Gdx/files) "src/pixel_perversion_engine/shader/greyscale/vertex.glsl")))
@@ -74,8 +76,8 @@
         root (assoc root :shaders {:greyscale shaderProgram})
         ;testing viewport zooming
         camera (.getCamera (get-in root [:fit-viewport]))]
-    ;(set! (.-zoom camera) 0.5) ;<-- converts screen from 16px to 32px
-    (def root-atomic (atom root)))
+    (set! (.-zoom camera) 0.35) ;0.5 <-- converts screen from 16px to 32px
+    (def root-atomic (atom root))
 
 
   ;(set! (.-shaderProgram (.-spineDrawable (get-in @root-atomic [:render]))) shaderProgram)
@@ -85,6 +87,8 @@
                             (new Texture (.internal Gdx/files "resources/cmap/cmap_brickwall.png"))
                             (new Texture (.internal Gdx/files "resources/nmap/nmap_brickwall.png"))))
   (def testCube_3D (new Cube_3D))
+  (def projMatrix4 (.cpy(.-combined camera)))
+  (.setToOrtho2D projMatrix4 0 0 800 480))
   )
 
 (defn render []
@@ -103,15 +107,26 @@
 
   ;(.render testCube_3D)
 
+  ;TODO most of the rendering will be abstracted into their proper namespaces
+  ;for example, rendering fps should be handled by the map-editor namespace
 
+  ;BOOKMARK box2d debug render
+  (.render (.getBox2DDebugRenderer (get-in @root-atomic [:render]))
+           (get-in @root-atomic [:game :box2d-world])
+           (.-combined (.getCamera (get-in @root-atomic [:fit-viewport]))))
 
   ;BOOKMARK println fps
   ;(println (.getFramesPerSecond Gdx/graphics))
   ;BOOKMARK render fps
+  (.setProjectionMatrix (get-in @root-atomic [:sprite-batch]) projMatrix4)
   (.begin (get-in @root-atomic [:sprite-batch]))
-  (render-text @root-atomic (str (.getFramesPerSecond Gdx/graphics)) 200 200)
+  (render-text @root-atomic
+               (str (.getFramesPerSecond Gdx/graphics))
+               (/(.getWidth Gdx/graphics)2)
+               30)
   (.end (get-in @root-atomic [:sprite-batch]))
 
+  ;BOOKMARK update input
   (.update (get-in @root-atomic [:input]))
   )
 
