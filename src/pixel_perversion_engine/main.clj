@@ -1,7 +1,7 @@
 (ns pixel-perversion-engine.main
   (:import [java_src Start]
            [com.badlogic.gdx.graphics.g2d SpriteBatch BitmapFont TextureRegion TextureAtlas Sprite]
-           [com.badlogic.gdx.graphics GL20 Color OrthographicCamera Texture]
+           [com.badlogic.gdx.graphics GL20 Color OrthographicCamera Texture Pixmap$Format Texture$TextureFilter]
            [com.badlogic.gdx Gdx]
            [com.pixel_perversion_engine.asset_manager Assets]
            [com.badlogic.gdx.utils.viewport FitViewport]
@@ -10,7 +10,7 @@
            [com.badlogic.gdx.physics.box2d World]
            [com.pixel_perversion_engine.box2d SpineBox2dController]
            [com.badlogic.gdx.math Vector2 Vector3]
-           [com.badlogic.gdx.graphics.glutils ShaderProgram ShapeRenderer$ShapeType]
+           [com.badlogic.gdx.graphics.glutils ShaderProgram ShapeRenderer$ShapeType FrameBuffer]
            [com.pixel_perversion_engine.shader TestShader_NMap]
            [com.pixel_perversion_engine.tests Cube_3D]
            [org.lwjgl.input Mouse])
@@ -19,6 +19,7 @@
     ;pixel-perversion-engine.scene.scene
     pixel-perversion-engine.render.render
     pixel-perversion-engine.object.object
+    pixel-perversion-engine.shader.shader
     snake-game.object.main-menu
     snake-game.object.game
     snake-game.object.player
@@ -52,19 +53,27 @@
 
 (def layers {:background 0 :midground 1 :foreground 2})
 
-(def vertexShader-BW nil)
-(def fragmentShader-BW nil)
-(def shaderProgram nil)
+(def test-texture nil)
 (def testShader_NMap nil)
 (def testCube_3D nil)
 (def projMatrix4 nil)
 
 (defn create []
-  (def vertexShader-BW (.readString (.internal (Gdx/files) "src/pixel_perversion_engine/shader/greyscale/vertex.glsl")))
-  (def fragmentShader-BW (.readString (.internal (Gdx/files) "src/pixel_perversion_engine/shader/greyscale/fragment.glsl")))
-  (def shaderProgram (new ShaderProgram vertexShader-BW fragmentShader-BW))
+  ;(def vertexShader-BW (.readString (.internal (Gdx/files) "src/pixel_perversion_engine/shader/greyscale/vertex.glsl")))
+  ;(def fragmentShader-BW (.readString (.internal (Gdx/files) "src/pixel_perversion_engine/shader/greyscale/fragment.glsl")))
+  ;(def shaderProgram (new ShaderProgram vertexShader-BW fragmentShader-BW))
+
   (spine-r/setup-render)
-  (let [root (root 800 480)
+  (let [greyscale (shader-program "src/pixel_perversion_engine/shader/passthrough/vertex.glsl"
+                                  "src/pixel_perversion_engine/shader/greyscale/fragment.glsl")
+        scanline (shader-program "src/pixel_perversion_engine/shader/passthrough/vertex.glsl"
+                                 "src/pixel_perversion_engine/shader/scanline/fragment.glsl")
+        passthrough (shader-program "src/pixel_perversion_engine/shader/passthrough/vertex.glsl"
+                                    "src/pixel_perversion_engine/shader/passthrough/fragment.glsl")
+        scale (shader-program "src/pixel_perversion_engine/shader/scale/vertex.glsl"
+                              "src/pixel_perversion_engine/shader/passthrough/fragment.glsl")
+
+        root (root 800 480)
         ;attach game
         root (game root) ;(attach-object root [:game] (game root))
         ;attach map-editor
@@ -73,10 +82,13 @@
         root (main-menu root) ;(attach-object game-attached [:main-menu] (main-menu root))
 
         ;attach shaders
-        root (assoc root :shaders {:greyscale shaderProgram})
+        root (assoc root :shaders {:greyscale greyscale
+                                   :scanline scanline
+                                   :passthrough passthrough
+                                   :scale scale})
         ;testing viewport zooming
         camera (.getCamera (get-in root [:fit-viewport]))]
-    (set! (.-zoom camera) 0.35) ;0.5 <-- converts screen from 16px to 32px
+    ;(set! (.-zoom camera) 0.1) ;0.5 <-- converts screen from 16px to 32px
     (def root-atomic (atom root))
 
 
@@ -89,13 +101,40 @@
   (def testCube_3D (new Cube_3D))
   (def projMatrix4 (.cpy(.-combined camera)))
   (.setToOrtho2D projMatrix4 0 0 800 480))
+
+  (def test-texture (new Texture (.internal Gdx/files "resources/nmap/nmap_brickwall.png")))
   )
 
 (defn render []
   (.glClearColor Gdx/gl 0 0 0 1)
   (.glClear Gdx/gl GL20/GL_COLOR_BUFFER_BIT)
 
+  ;test render nmap shader
   (.render testShader_NMap)
+
+  (comment
+    ;test render shader on cmap
+    (let [spritebath (get-in @root-atomic [:sprite-batch])
+          viewport (get-in @root-atomic [:fit-viewport])
+          camera (.getCamera viewport)
+          scanline (get-in @root-atomic [:shaders :scanline])
+          passthrough (get-in @root-atomic [:shaders :passthrough])
+          scale (get-in @root-atomic [:shaders :scale])
+          fbo (new FrameBuffer Pixmap$Format/RGBA8888 (float 800.0) (float 480.0) false)]
+      ;(.setProjectionMatrix spritebath (.-combined camera))
+      (.setShader spritebath scanline)
+      (.begin fbo)
+      (.begin spritebath)
+      (.draw spritebath test-texture (float 0.0) (float 0.0))
+      (.end spritebath)
+      (.end fbo)
+      (.setShader spritebath scale)
+      (.begin spritebath)
+      (let [texture (.getColorBufferTexture fbo)]
+        (.setFilter texture Texture$TextureFilter/Nearest Texture$TextureFilter/Nearest)
+        (.draw spritebath texture (float 0.0) (float 0.0)))
+      (.end spritebath))
+    )
 
   ;update all app logic
   (update! root-atomic proc-path)

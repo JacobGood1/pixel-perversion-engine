@@ -37,7 +37,7 @@ public class TestShader_NMap extends Shader{
 
 
     final String VERT =
-            Gdx.files.internal("src/pixel_perversion_engine/shader/nmap/vertex.glsl").readString();
+            Gdx.files.internal("src/pixel_perversion_engine/shader/passthrough/vertex.glsl").readString();
 
     //no changes except for LOWP for color values
     //we would store this in a file for increased readability

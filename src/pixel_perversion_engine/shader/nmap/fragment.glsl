@@ -1,6 +1,6 @@
 //attributes from vertex shader
-varying vec4 vColor;
-varying vec2 vTexCoord;
+varying vec4 v_color;
+varying vec2 v_texCoords;
 
 //our texture samplers
 uniform sampler2D u_texture;   //diffuse map
@@ -15,10 +15,10 @@ uniform vec3 Falloff;         //attenuation coefficients
 
 void main() {
     //RGBA of our diffuse color
-    vec4 DiffuseColor = texture2D(u_texture, vTexCoord);
+    vec4 DiffuseColor = texture2D(u_texture, v_texCoords);
 
     //RGB of our normal map
-    vec3 NormalMap = texture2D(u_normals, vTexCoord).rgb;
+    vec3 NormalMap = texture2D(u_normals, v_texCoords).rgb;
 
     //this flips an axis... right?
     //NormalMap.g = 1 - NormalMap.g;
@@ -50,6 +50,6 @@ void main() {
     vec3 Intensity = Ambient + Diffuse * Attenuation;
     vec3 FinalColor = DiffuseColor.rgb * Intensity;
 
-    gl_FragColor = vColor * vec4(FinalColor, DiffuseColor.a);
+    gl_FragColor = v_color * vec4(FinalColor, DiffuseColor.a);
     //gl_FragColor = vec4(1.0);
 }

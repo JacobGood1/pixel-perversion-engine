@@ -42,7 +42,7 @@
                   :render-index 0
                   :type         :sprite
                   :renderable   sprite
-                  :shader       :normal}
+                  :shader       :scanline}; :normal :scanline
 
      :position   position
      :sprite     sprite
