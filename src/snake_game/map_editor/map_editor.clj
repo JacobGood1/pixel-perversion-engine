@@ -19,7 +19,7 @@
                                   :brush (brush/brush root)
                                   :vec3  (new Vector3)
                                   :gui   (gui/gui root)
-                                  :grid-size (float 32)
+                                  :grid-size (float 1) ;16
                                   })
         ;attach map-editor to root
         root (assoc root :map-editor map-editor)]

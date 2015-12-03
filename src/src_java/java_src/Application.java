@@ -2,7 +2,8 @@ package java_src;
 
 import clojure.lang.AFn;
 import com.badlogic.gdx.ApplicationListener;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;import java.lang.Override;
+import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
+import java.lang.Override;
 
 
 public class Application implements ApplicationListener {

@@ -1,5 +1,6 @@
 package com.pixel_perversion_engine.box2d;
 
+import clojure.lang.AFn;
 import com.badlogic.gdx.physics.box2d.*;
 
 /**
@@ -8,33 +9,28 @@ import com.badlogic.gdx.physics.box2d.*;
  * Creates a simple box2d body, usually for a character controller.
  */
 
-public class BodySimple {
-    public enum Type {
-        Static,
-        Dynamic,
-        Kinematic
-    }
-    public Body body;
-    private short groupIndex;
-    private World world;
-    public String name;
+public class BodySimple extends Body {
+    private AFn beginContact;
+    private AFn endContact;
 
-    public BodySimple (World world, float x, float y, float width, float height, String name, Type type) {
-        this.name = name;
-        this.world = world;
-
+    public BodySimple (World world, float x, float y, float width, float height, String name, Body.Type type, AFn beginContact, AFn endContact) {
+        this.beginContact = beginContact;
+        this.endContact = endContact;
+        super.world = world;
+        super.name = name;
         setup(x, y, width, height, type);
     }
 
-    private void setup (float x, float y, float width, float height, Type type) {
+    private void setup (float x, float y, float width, float height, Body.Type type) {
         //com.pixel_perversion_engine.box2d
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(width/2, height/2);
         //shape.set(worldCoordinate_Verts);//worldCoordinate_Verts
         FixtureDef fd = new FixtureDef();
         fd.shape = shape;
-        fd.filter.groupIndex = groupIndex;
-        fd.friction = 1.0f;
+        fd.filter.groupIndex = super.groupIndex;
+        //fd.friction = 1.0f;
+        fd.friction = 0.0f;
         fd.restitution = 0.0f;
         fd.density = 1.2f;//80.7f / (float) Math.pow(1.75, 2);
         BodyDef bodyDef = new BodyDef();
@@ -53,11 +49,27 @@ public class BodySimple {
                 break;
         }
         bodyDef.position.set(x + (width/2), y + (height/2));
-        body = this.world.createBody(bodyDef);
+        super.body = this.world.createBody(bodyDef);
         //controller.setLinearVelocity(0f, 0f);
         Fixture f = body.createFixture(fd);
         //assign THIS to the fixture's userData for the contact listener
         f.setUserData(this);
         shape.dispose();
+    }
+
+    public void beginContact(Body a, Body b) {
+        beginContact.invoke(a, b);
+    }
+
+    public void endContact(Body a, Body b) {
+        endContact.invoke(a, b);
+    }
+
+    public void preSolve(Body a, Body b) {
+
+    }
+
+    public void postSolve(Body a, Body b) {
+
     }
 }

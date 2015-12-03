@@ -11,7 +11,8 @@ import com.pixel_perversion_engine.render.Render;
  */
 public class TouchDiagnostic {
     private Input input;
-    private Render render;
+    private Viewport viewport;
+    //private Render render;
 
     private Vector2 coordinate = new Vector2(0,0);
     private Vector3 unproject = new Vector3(0,0,0);
@@ -53,10 +54,10 @@ public class TouchDiagnostic {
     //flick
     boolean flicked = false;
 
-    TouchDiagnostic(Input input, Render render) {
+    TouchDiagnostic(Input input, Viewport viewport) {
         //pdd = new PointDragDisplacement(world.getInput());
         this.input = input;
-        this.render = render;
+        //this.render = render;
 
         coordinatePressed = new Vector2(0,0);
         coordinateHeld = new Vector2(0,0);
@@ -160,7 +161,7 @@ public class TouchDiagnostic {
     public Vector2 getCoordinatePressed(Viewport viewport) {//Enum cameraType
         unproject.x = coordinatePressed.x;
         unproject.y = coordinatePressed.y;
-        Vector3 coordinate = viewport.getCamera().unproject(unproject);//world.getRender().camera.getCamera(cameraType).unproject(unproject);
+        Vector3 coordinate = viewport.unproject(unproject);//world.getRender().camera.getCamera(cameraType).unproject(unproject);
         this.coordinate.x = coordinate.x;
         this.coordinate.y = coordinate.y;
         return this.coordinate;
@@ -168,7 +169,7 @@ public class TouchDiagnostic {
     public Vector2 getCoordinateHeld(Enum cameraType) {
         unproject.x = coordinateHeld.x;
         unproject.y = coordinateHeld.y;
-        Vector3 coordinate = render.camera.getCamera(cameraType).unproject(unproject);
+        Vector3 coordinate = viewport.unproject(unproject);
         this.coordinate.x = coordinate.x;
         this.coordinate.y = coordinate.y;
         return this.coordinate;
@@ -176,7 +177,7 @@ public class TouchDiagnostic {
     public Vector2 getCoordinateReleased(Viewport viewport) {
         unproject.x = coordinateReleased.x;
         unproject.y = coordinateReleased.y;
-        Vector3 coordinate = viewport.getCamera().unproject(unproject);//world.getRender().camera.getCamera(cameraType).unproject(unproject);
+        Vector3 coordinate = viewport.unproject(unproject);//world.getRender().camera.getCamera(cameraType).unproject(unproject);
         this.coordinate.x = coordinate.x;
         this.coordinate.y = coordinate.y;
         return this.coordinate;
@@ -185,7 +186,7 @@ public class TouchDiagnostic {
     public Vector2 getCoordinateDragged(Viewport viewport){
         unproject.x = coordinateDragged.x;
         unproject.y = coordinateDragged.y;
-        Vector3 coordinate = viewport.getCamera().unproject(unproject);//world.getRender().camera.getCamera(cameraType).unproject(unproject);
+        Vector3 coordinate = viewport.unproject(unproject);//world.getRender().camera.getCamera(cameraType).unproject(unproject);
         this.coordinate.x = coordinate.x;
         this.coordinate.y = coordinate.y;
         return this.coordinate;
@@ -194,7 +195,7 @@ public class TouchDiagnostic {
     public Vector2 getCoordinateHover(Viewport viewport){
         unproject.x = coordinateHover.x;
         unproject.y = coordinateHover.y;
-        Vector3 coordinate = viewport.getCamera().unproject(unproject);//world.getRender().camera.getCamera(cameraType).unproject(unproject);
+        Vector3 coordinate = viewport.unproject(unproject);//world.getRender().camera.getCamera(cameraType).unproject(unproject);
         this.coordinate.x = coordinate.x;
         this.coordinate.y = coordinate.y;
         return this.coordinate;

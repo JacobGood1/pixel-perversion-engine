@@ -11,7 +11,8 @@ uniform mat4 u_projTrans;
 uniform vec2 resolution;
 
 void main() {
-        vec3 color = texture2D(u_texture, v_texCoords).rgb;
+        float fac = 0.9;
+        vec4 color = texture2D(u_texture, v_texCoords).rgba;
 
         //determine center position
         vec2 p = (gl_FragCoord.y / resolution.y);
@@ -26,7 +27,10 @@ void main() {
 
         //gl_FragColor = (gl_FragCoord.x<25.0) ? vec4(1.0, 0.0, 0.0, 1.0) : vec4(0.0, 1.0, 0.0, 1.0);
         //gl_FragColor = (gl_FragCoord.y<25.0) ? vec4(texture2D(u_texture, v_texCoords).rgb ,1.0) : vec4(0.0, 1.0, 0.0, 1.0);
-        gl_FragColor = (mod(gl_FragCoord.y, 2) >= 1.0) ? vec4(color.rgb ,1.0) : vec4(color.r * 0.5, color.g * 0.5, color.b * 0.5 ,1.0);
+        gl_FragColor = (mod(gl_FragCoord.y, 2) >= 1.0) ?
+        vec4(color.r * fac, color.g * fac, color.b * fac, color.a)
+        :
+        vec4(color.rgb, color.a);
 
         //gl_FragColor = vec4(color, 1.0);
 }

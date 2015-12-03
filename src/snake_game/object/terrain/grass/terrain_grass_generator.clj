@@ -1,5 +1,5 @@
 (ns snake-game.object.terrain.grass.terrain-grass-generator
-  (:import [com.pixel_perversion_engine.box2d BodySimple$Type BodySimple]
+  (:import [com.pixel_perversion_engine.box2d BodySimple Body$Type]
            [com.badlogic.gdx.graphics.g2d TextureAtlas])
   (:use pixel-perversion-engine.object.object))
 
@@ -10,11 +10,12 @@
         r   (get-in obj [:render :renderable])
         s   (get-in obj [:render :shader])
         sprite (:renderable (:render obj))
+        sprite-size (.getWidth (:sprite obj))
         pos (:position obj)
         x (first pos)
         y (second pos)]
     ;(println [x y])
-    (.setPosition sprite x y)
+    (.setPosition sprite (* sprite-size x) (* sprite-size y))
     (add-to-layer root r-l r-i (:render obj))))
 
 (defn update-position
@@ -41,11 +42,12 @@
      :render     {:render-layer 5 ;(:midground layers)
                   :render-index 0
                   :type         :sprite
-                  :renderable   sprite
-                  :shader       :scanline}; :normal :scanline
+                  :renderable   sprite} ; :normal :scanline
 
      :position   position
      :sprite     sprite
-     :box2d-body (new BodySimple (get-in root [:game :box2d-world]) (first position) (second position) size size (str name) (BodySimple$Type/Static))
+     :box2d-body (new BodySimple (get-in root [:game :box2d-world]) (first position) (second position) 1.0 1.0 (str name) (Body$Type/Static)
+                      (fn [this other])
+                      (fn [this other]))
      }
     ))

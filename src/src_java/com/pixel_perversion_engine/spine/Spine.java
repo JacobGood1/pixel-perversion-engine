@@ -28,8 +28,7 @@ public class Spine {
     private boolean maskAA = false;
     private float maskX = 0f, maskY = 0f, maskHeight = 0f, maskWidth = 0f;
 
-    public Spine(Render render,
-                 AssetManager assetManager,
+    public Spine(AssetManager assetManager,
                  String textureAtlasPath,
                  String jsonPath,
                  float x, float y, float scale) {
@@ -90,8 +89,8 @@ public class Spine {
     }
 
     //secondary constructor for cloning
-    public Spine(Render render, AssetManager assetManager, Spine spine, float x, float y){
-        this(render, assetManager, spine.getTextureAtlasPath(), spine.getJsonPath(), x, y, spine.getScale());
+    public Spine(AssetManager assetManager, Spine spine, float x, float y){
+        this(assetManager, spine.getTextureAtlasPath(), spine.getJsonPath(), x, y, spine.getScale());
     }
 
     public void update() {

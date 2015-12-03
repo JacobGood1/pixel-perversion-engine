@@ -94,20 +94,22 @@
   (println "brush!"))
 
 (defn update-brush
-  [root {:keys [position tile-preview-color-add] :as brush}]
+  [{:keys [fit-viewport input] :as root} {:keys [position tile-preview-color-add] :as brush}]
+  (let [sprite-size 16
+        box2d-size 1
+        shader-offset 4]
+    (set! (.-zoom (.getCamera fit-viewport)) (/ (/ box2d-size sprite-size) shader-offset));0.25
+    (.apply fit-viewport false))
   (let [grid-size (get-in root [:map-editor :grid-size])
-        input (:input root)
-        viewport (:fit-viewport root)
         touch-diagnostic (first (.-touchDiagnostic input))
         touch-released? (.touchReleased touch-diagnostic)
-        coordinate (.getCoordinateHover touch-diagnostic viewport);(.getCoordinateReleased touch-diagnostic viewport)
+        coordinate (.getCoordinateHover touch-diagnostic fit-viewport);(.getCoordinateReleased touch-diagnostic viewport)
         x (.x coordinate)
         y (.y coordinate)
         camera (.getCamera (:fit-viewport root))
 
-        shape-renderer (.getShapeRenderer (:render root))]
+        shape-renderer (:shape-renderer root)]
 
-    (.apply (:fit-viewport root) false)
     (let [snap-x (- x (mod x grid-size))
           snap-y (- y (mod y grid-size))]
       ;(println snap-x)

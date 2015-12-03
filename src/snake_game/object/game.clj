@@ -2,7 +2,8 @@
   (:require [pixel-perversion-engine.object.object :as object]
             [snake-game.object.player :as player])
   (:import [com.badlogic.gdx.math Vector2]
-           [com.badlogic.gdx.physics.box2d World]))
+           [com.badlogic.gdx.physics.box2d World]
+           [com.pixel_perversion_engine.box2d ContactListener]))
 
 (def time-step (float 0.016))
 (defn step-box2d-world
@@ -18,7 +19,7 @@
   ;then attach player to itself (:game).
   (let [
         ;create game object
-        box2d-world (new World (new Vector2 (float 0) (float 0)) false) ;gravity -9.18
+        box2d-world (new World (new Vector2 (float 0) (float (* 3 -9.18))) false) ;gravity -9.18
         game (object/check-object {
                                    :name         :game
                                    :path         [:game]
@@ -38,12 +39,16 @@
         ;attach player to game
 
         ;testing player
-        ;root (update-in root [:game :player] (fn [_] (player/player root)))
+        root (update-in root [:game :player] (fn [_] (player/player root)))
         ;root (update-in root [:game :player2] (fn [_] (player/player2 root)))
 
         ;testing tile
         ;root (update-in root [:game :tile-plain] (fn [_] (tile-plain/tile-plain root [0.0 0.0])))
         ;return result
         ]
+
+    ;set contact listener for World
+    (.setContactListener box2d-world (new ContactListener))
+
     root
     ))

@@ -7,7 +7,7 @@
            [com.badlogic.gdx.graphics.g2d TextureRegion]))
 
 (defn render
-  [^Render render ^Viewport viewport objs shader-program]
+  [^Render render ^Viewport viewport objs fbo]
   (let [
         camera (.getCamera viewport)
         sprite-batch (.getSpriteBatch render)]
@@ -19,18 +19,21 @@
     (.apply viewport false)
     ;(.update camera)
 
-    (.setShader sprite-batch shader-program)
+    (.setShader sprite-batch nil)
     (.setProjectionMatrix sprite-batch (.-combined camera))
 
+    (.begin fbo)
     (.begin sprite-batch)
 
     (doseq [obj objs]
       (.draw (:renderable obj) sprite-batch))
 
     (.end sprite-batch)
-    ;(.end fbo)
+    (.end fbo)
 
     ;(.dispose fbo)
+
+    ;NOTE: The fbo does not need to be returned. All state is stored within a java object.
     ))
 
 (comment

@@ -134,7 +134,7 @@
                 tiles
                 tiles-window] :as obj}]
 
-  (let [shape-renderer (.getShapeRenderer (:render root))
+  (let [shape-renderer (:shape-renderer root)
         color (:color tiles-window)
 
         tiles-inner-window (:tiles-inner-window tiles-window)

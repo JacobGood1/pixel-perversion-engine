@@ -1,11 +1,10 @@
 package com.pixel_perversion_engine.input;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
-import com.pixel_perversion_engine.render.Render;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,7 +16,6 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class Input{
     private InputProcessor inputProcessor;
-    public OrthographicCamera camera;
     private Vector3 unproject = new Vector3(0,0,0);
     private String keys;
     private ConcurrentMap keyPressedMap;
@@ -34,20 +32,18 @@ public class Input{
     public Array<FloatArray> masks = new Array<FloatArray>();
     public boolean consumed = false;
 
-    public Input(Render render) {
+    public Input(Viewport viewport) {
         inputProcessor = new InputProcessor(this);
         Gdx.input.setInputProcessor(inputProcessor);
 
         keys = "QWERTYUIOPASDFGHJKLZXCVBNM";
         //"WASDZXROP";
 
-        this.camera = camera;
-
 
         touchDiagnostic = new Array<TouchDiagnostic>();
         //support for up to 5 simultaneous input
         for (int i = 0; i < 5; i++) {
-            touchDiagnostic.add(new TouchDiagnostic(this, render));
+            touchDiagnostic.add(new TouchDiagnostic(this, viewport));
         }
 
 
@@ -120,9 +116,6 @@ public class Input{
     public void setBackKeyReleased(boolean backKeyReleased) {
         this.backKeyReleased = backKeyReleased;
     }
-
-    public OrthographicCamera getCamera() {return camera;}
-    public void setCamera(OrthographicCamera camera) {this.camera = camera;}
 
     public InputProcessor getInputProcessor() {return inputProcessor;}
     public void setInputProcessor(InputProcessor inputProcessor) {this.inputProcessor = inputProcessor;}

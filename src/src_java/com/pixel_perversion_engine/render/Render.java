@@ -25,6 +25,8 @@ import java.util.Map;
  * Initiates Objects required for rendering and provides common rendering fns.
  */
 
+//TODO this object is slowly being dissolved... work on eliminating it completely.
+
 public class Render {
     private boolean debug = true;
 

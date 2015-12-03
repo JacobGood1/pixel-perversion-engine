@@ -1,31 +1,45 @@
 (ns pixel-perversion-engine.object.object
-  (:import [com.badlogic.gdx.graphics.g2d SpriteBatch BitmapFont]
+  (:import [com.badlogic.gdx.graphics.g2d SpriteBatch BitmapFont TextureRegion PolygonSpriteBatch]
            [com.pixel_perversion_engine.asset_manager Assets]
            [com.badlogic.gdx.graphics OrthographicCamera Color]
            [com.badlogic.gdx.utils.viewport FitViewport]
            [com.pixel_perversion_engine.render Render]
-           [com.pixel_perversion_engine.input Input]))
+           [com.pixel_perversion_engine.input Input]
+           [com.badlogic.gdx.graphics.glutils ShapeRenderer]
+           [com.esotericsoftware.spine SkeletonRenderer]
+           [com.badlogic.gdx.physics.box2d Box2DDebugRenderer]))
 
 ;TODO some stuff that exists in root also exists in Render such as sprite-batch... this is very bad stuff!
 (defn root
   [width height]
   (let [orthographic-camera (new OrthographicCamera (float width) (float height))
         sprite-batch (new SpriteBatch)
+        polygon-batch (new PolygonSpriteBatch)
+        shape-renderer (new ShapeRenderer)
+        skeleton-renderer (new SkeletonRenderer)
+        box2d-debug-renderer (new Box2DDebugRenderer)
         bitmap-font (new BitmapFont)
-        render (new Render)]
+        viewport-fit (new FitViewport (float 800) (float 480) orthographic-camera)
+        ;render (new Render)
+        ]
     (.setColor bitmap-font Color/RED)
     {
-     :name                :root
-     :asset-manager       (new Assets)
-     :orthographic-camera orthographic-camera
-     :fit-viewport        (new FitViewport (float 800) (float 480) orthographic-camera) ;(float (* (* 0.001 5) 800)) (float (* (* 0.001 5) 480))
-     :sprite-batch        sprite-batch
-     :bitmap-font         bitmap-font
-     :render              render
-     :input               (new Input render)
-     :dispose-list        [sprite-batch bitmap-font]
-     :layers              {}
-     :shaders             {:normal nil}
+     :name                 :root
+     :asset-manager        (new Assets)
+     :orthographic-camera  orthographic-camera
+     :fit-viewport         viewport-fit ;(float (* (* 0.001 5) 800)) (float (* (* 0.001 5) 480))
+     :sprite-batch         sprite-batch
+     :polygon-batch        polygon-batch
+     :shape-renderer       shape-renderer
+     :skeleton-renderer    skeleton-renderer
+     :box2d-debug-renderer box2d-debug-renderer
+     :bitmap-font          bitmap-font
+     ;:render               render
+     :input                (new Input viewport-fit)
+     :dispose-list         [sprite-batch bitmap-font]
+     :layers               {}
+     :shaders              {:normal nil}
+     :fbo-textureRegion    (new TextureRegion)
      }
     ))
 

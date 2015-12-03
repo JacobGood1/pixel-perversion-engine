@@ -81,14 +81,30 @@
         ;attach root
         root (main-menu root) ;(attach-object game-attached [:main-menu] (main-menu root))
 
+        ;create an fbo for every layer, all elements within a layer get's compiled into a single fbo ;;{:2 (new FBO) :5 (new FBO)}
+        root (assoc root :fbos
+                         (reduce (fn [m k]
+                                   (assoc m k (new FrameBuffer Pixmap$Format/RGBA8888 800 480 false))) {} (range 10)))
+
+        ;create an fbo for every shader network
+        root (update-in root [:fbos] conj {:greyscale (new FrameBuffer Pixmap$Format/RGBA8888 800 480 false)
+                                           :scanline (new FrameBuffer Pixmap$Format/RGBA8888 800 480 false)
+                                           :passthrough (new FrameBuffer Pixmap$Format/RGBA8888 800 480 false)
+                                           :scale (new FrameBuffer Pixmap$Format/RGBA8888 800 480 false)})
+
         ;attach shaders
         root (assoc root :shaders {:greyscale greyscale
                                    :scanline scanline
                                    :passthrough passthrough
                                    :scale scale})
+
+        ;update root dispose list for the newly added fbos
+        root (update-in root [:dispose-list] conj
+                        (for [[k fbo] (get-in root [:fbos])] fbo))
+
         ;testing viewport zooming
         camera (.getCamera (get-in root [:fit-viewport]))]
-    ;(set! (.-zoom camera) 0.1) ;0.5 <-- converts screen from 16px to 32px
+    ;(set! (.-zoom camera) 1.1) ;0.5 <-- converts screen from 16px to 32px
     (def root-atomic (atom root))
 
 
@@ -142,7 +158,9 @@
   ;update viewport
   (.update (get-in @root-atomic [:fit-viewport]) (float 800) (float 480))
 
-  (render-all @root-atomic)
+  ;(time
+    (render-all @root-atomic)
+  ;)
 
   ;(.render testCube_3D)
 
@@ -150,7 +168,12 @@
   ;for example, rendering fps should be handled by the map-editor namespace
 
   ;BOOKMARK box2d debug render
-  (.render (.getBox2DDebugRenderer (get-in @root-atomic [:render]))
+  (let [sprite-size 16
+        box2d-size 1
+        shader-offset 4]
+    (set! (.-zoom (.getCamera (get-in @root-atomic [:fit-viewport]))) (/ (/ box2d-size sprite-size) shader-offset))
+    (.apply (get-in @root-atomic [:fit-viewport]) false))
+  (.render (get-in @root-atomic [:box2d-debug-renderer])
            (get-in @root-atomic [:game :box2d-world])
            (.-combined (.getCamera (get-in @root-atomic [:fit-viewport]))))
 
@@ -171,7 +194,11 @@
 
 (defn resize [width height]
   ;update viewport
-  (.update (get-in @root-atomic [:fit-viewport]) (float width) (float height)))
+  (.update (get-in @root-atomic [:fit-viewport]) (float width) (float height))
+  ;update fbos
+  (doseq [[k fbo] (get-in @root-atomic [:fbos])]
+    )
+  )
 (defn pause [])
 (defn resume [])
 
