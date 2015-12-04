@@ -30,7 +30,7 @@
                                    ;:player       (player/player root)
                                    ;:player2      (player/player2 root)
                                    :tile-plain   {};(tile-plain/tile-plain root [0.0 0.0])
-                            })
+                                   })
 
         ;attach game to root
         root (assoc root :game game)

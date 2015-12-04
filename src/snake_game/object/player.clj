@@ -147,14 +147,14 @@
                               lv (.getLinearVelocity body)
                               ly (.-y lv)]
                           ;body.setGravityScale(0.0f);
-                          (.setGravityScale (.-body this) (float 0.0))
-                          (.setLinearVelocity body (float 0.0) ly)
+                          ;(.setGravityScale (.-body this) (float 0.0))
+                          ;(.setLinearVelocity body (float 0.0) (float 0.0))
                           (println "begin contact: " name)))
                       ;end contact
                       (fn [this other]
                         (let [name (.-name this)]
                           ;body.setGravityScale(3f * -9.18f);
-                          (.setGravityScale (.-body this) (float 1.0))
+                          ;(.setGravityScale (.-body this) (float 1.0))
                           (println "end contact: " name)))
                       )
      :time       0.0
