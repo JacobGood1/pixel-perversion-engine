@@ -10,7 +10,7 @@
            [com.badlogic.gdx.physics.box2d World]
            [com.pixel_perversion_engine.box2d SpineBox2dController]
            [com.badlogic.gdx.math Vector2 Vector3]
-           [com.badlogic.gdx.graphics.glutils ShaderProgram ShapeRenderer$ShapeType FrameBuffer]
+           [com.badlogic.gdx.graphics.glutils ShaderProgram ShapeRenderer$ShapeType FrameBuffer ShapeRenderer]
            [com.pixel_perversion_engine.shader TestShader_NMap]
            [com.pixel_perversion_engine.tests Cube_3D]
            [org.lwjgl.input Mouse])

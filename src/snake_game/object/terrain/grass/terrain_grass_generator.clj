@@ -1,5 +1,5 @@
 (ns snake-game.object.terrain.grass.terrain-grass-generator
-  (:import [com.pixel_perversion_engine.box2d BodySimple Body$Type]
+  (:import [com.pixel_perversion_engine.box2d BodySimple_Square Body$Type]
            [com.badlogic.gdx.graphics.g2d TextureAtlas])
   (:use pixel-perversion-engine.object.object))
 
@@ -46,8 +46,11 @@
 
      :position   position
      :sprite     sprite
-     :box2d-body (new BodySimple (get-in root [:game :box2d-world]) (first position) (second position) 1.0 1.0 (str name) (Body$Type/Static)
+     :box2d-body (new BodySimple_Square (get-in root [:game :box2d-world]) (first position) (second position) 1.0 1.0 (str name) (Body$Type/Static)
                       (fn [this other])
-                      (fn [this other]))
+                      (fn [this other])
+                      (fn [this other contact manifold])
+                      (fn [this other contact contactImpulse])
+                      )
      }
     ))

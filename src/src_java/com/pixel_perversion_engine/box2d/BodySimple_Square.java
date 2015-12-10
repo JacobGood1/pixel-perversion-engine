@@ -1,6 +1,7 @@
 package com.pixel_perversion_engine.box2d;
 
 import clojure.lang.AFn;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 
 /**
@@ -9,26 +10,36 @@ import com.badlogic.gdx.physics.box2d.*;
  * Creates a simple box2d body, usually for a character controller.
  */
 
-public class BodySimple extends Body {
-    private AFn beginContact;
-    private AFn endContact;
+public class BodySimple_Square extends Body {
 
-    public BodySimple (World world, float x, float y, float width, float height, String name, Body.Type type, AFn beginContact, AFn endContact) {
-        this.beginContact = beginContact;
-        this.endContact = endContact;
-        super.world = world;
-        super.name = name;
+    public BodySimple_Square(World world, float x, float y, float width, float height, String name, Body.Type type,
+                             AFn beginContact, AFn endContact, AFn preSolve, AFn postSolve) {
+
+        super(world, name, beginContact, endContact, preSolve, postSolve);
         setup(x, y, width, height, type);
+        buildOffset();
     }
 
-    private void setup (float x, float y, float width, float height, Body.Type type) {
+    protected void setup (float x, float y, float width, float height, Body.Type type) {
         //com.pixel_perversion_engine.box2d
+        Vector2[] vertices = new Vector2[4];
+        vertices[0] = new Vector2(-0.5f, 0.5f);
+        vertices[1] = new Vector2(0.5f, 0.5f);
+        vertices[2] = new Vector2(0.5f, -0.5f);
+        vertices[3] = new Vector2(-0.5f, -0.5f);
+
+        ChainShape chainShape = new ChainShape();
+        chainShape.createLoop(vertices);
+
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(width/2, height/2);
+        point1.x = -width/2; point1.y = height/2;//width/2; point1.y = height/2;
+        point2.x = width/2; point2.y = height/2;//width/2; point2.y = -height/2;
         //shape.set(worldCoordinate_Verts);//worldCoordinate_Verts
         FixtureDef fd = new FixtureDef();
-        fd.shape = shape;
+        fd.shape = chainShape;//shape;
         fd.filter.groupIndex = super.groupIndex;
+        fd.filter.categoryBits = Category.Square.getNumVal();//0x0008;
         //fd.friction = 1.0f;
         fd.friction = 0.0f;
         fd.restitution = 0.0f;
@@ -53,23 +64,7 @@ public class BodySimple extends Body {
         //controller.setLinearVelocity(0f, 0f);
         Fixture f = body.createFixture(fd);
         //assign THIS to the fixture's userData for the contact listener
-        f.setUserData(this);
+        f.setUserData(super.makeUserData(this, "square"));//ground //this
         shape.dispose();
-    }
-
-    public void beginContact(Body a, Body b) {
-        beginContact.invoke(a, b);
-    }
-
-    public void endContact(Body a, Body b) {
-        endContact.invoke(a, b);
-    }
-
-    public void preSolve(Body a, Body b) {
-
-    }
-
-    public void postSolve(Body a, Body b) {
-
     }
 }
